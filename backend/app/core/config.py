@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     app_name: str = "Taskflow"
     environment: str = "development"
     debug: bool = True
+    database_url: str = "sqlite:///./taskflow.db"
 
 
 settings = Settings()

@@ -25,4 +25,5 @@ repos:
     hooks:
       - id: mypy
         files: ^backend/
+        exclude: ^backend/alembic/
         additional_dependencies: [pydantic, pydantic-settings]
