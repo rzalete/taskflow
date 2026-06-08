@@ -9,5 +9,10 @@ class Settings(BaseSettings):
     debug: bool = True
     database_url: str = "sqlite:///./taskflow.db"
 
+    # Auth / JWT
+    secret_key: str = "dev-only-secret-change-me-in-production-please"
+    algorithm: str = "HS256"
+    access_token_expire_minutes: int = 30
+
 
 settings = Settings()
