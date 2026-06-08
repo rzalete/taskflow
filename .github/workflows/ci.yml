@@ -37,3 +37,34 @@ jobs:
 
       - name: Run tests (pytest)
         run: pytest .
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Enable Corepack (pnpm)
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint (eslint)
+        run: pnpm lint
+
+      - name: Format check (prettier)
+        run: pnpm format:check
+
+      - name: Type check (tsc)
+        run: pnpm typecheck
+
+      - name: Build (vite)
+        run: pnpm build
