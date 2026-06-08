@@ -9,6 +9,7 @@ from app.db.base import Base, TimestampMixin
 
 if TYPE_CHECKING:
     from app.models.membership import Membership
+    from app.models.project import Project
 
 
 class Team(Base, TimestampMixin):
@@ -18,5 +19,8 @@ class Team(Base, TimestampMixin):
     name: Mapped[str] = mapped_column(String(255))
 
     memberships: Mapped[list[Membership]] = relationship(
+        back_populates="team", cascade="all, delete-orphan"
+    )
+    projects: Mapped[list[Project]] = relationship(
         back_populates="team", cascade="all, delete-orphan"
     )

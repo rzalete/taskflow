@@ -9,6 +9,7 @@ from app.db.base import Base, TimestampMixin
 
 if TYPE_CHECKING:
     from app.models.membership import Membership
+    from app.models.task import Task
 
 
 class User(Base, TimestampMixin):
@@ -23,3 +24,4 @@ class User(Base, TimestampMixin):
     memberships: Mapped[list[Membership]] = relationship(
         back_populates="user", cascade="all, delete-orphan"
     )
+    assigned_tasks: Mapped[list[Task]] = relationship(back_populates="assignee")
