@@ -17,6 +17,16 @@ export async function getProjects(teamId: number): Promise<Project[]> {
   return data
 }
 
+export async function getProject(
+  teamId: number,
+  projectId: number,
+): Promise<Project> {
+  const { data } = await api.get<Project>(
+    `/teams/${teamId}/projects/${projectId}`,
+  )
+  return data
+}
+
 export async function createProject(
   teamId: number,
   payload: CreateProjectPayload,
