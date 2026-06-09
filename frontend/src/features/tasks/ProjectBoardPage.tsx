@@ -42,10 +42,17 @@ export function ProjectBoardPage() {
 
   const membersQuery = useMembers(team)
   const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null)
+  const [assigneeFilter, setAssigneeFilter] = useState<string>("all")
   const justDraggedRef = useRef(false)
 
   const selectedTask =
     tasksQuery.data?.find((task) => task.id === selectedTaskId) ?? null
+
+  const visibleTasks = (tasksQuery.data ?? []).filter((task) => {
+    if (assigneeFilter === "all") return true
+    if (assigneeFilter === "unassigned") return task.assignee_id === null
+    return task.assignee_id === Number(assigneeFilter)
+  })
 
   function handleOpen(taskId: number) {
     if (justDraggedRef.current) return
@@ -100,6 +107,24 @@ export function ProjectBoardPage() {
         </button>
       </form>
 
+      <div className="mt-4 flex items-center gap-2">
+        <span className="text-sm text-slate-600">Assignee:</span>
+        <select
+          aria-label="Filter by assignee"
+          value={assigneeFilter}
+          onChange={(event) => setAssigneeFilter(event.target.value)}
+          className="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+        >
+          <option value="all">All assignees</option>
+          <option value="unassigned">Unassigned</option>
+          {(membersQuery.data ?? []).map((member) => (
+            <option key={member.user_id} value={String(member.user_id)}>
+              {member.full_name}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {tasksQuery.isError && (
         <p className="mt-4 text-sm text-red-600">Couldn't load tasks.</p>
       )}
@@ -107,10 +132,9 @@ export function ProjectBoardPage() {
       <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
         <div className="mt-6 flex gap-4 overflow-x-auto pb-4">
           {COLUMNS.map((column) => {
-            const columnTasks =
-              tasksQuery.data?.filter(
-                (task) => task.status === column.status,
-              ) ?? []
+            const columnTasks = visibleTasks.filter(
+              (task) => task.status === column.status,
+            )
             return (
               <BoardColumn
                 key={column.status}

@@ -70,7 +70,7 @@ const initialTasks: MockTask[] = [
     priority: "high",
     due_date: null,
     project_id: 1,
-    assignee_id: null,
+    assignee_id: 1,
   },
   {
     id: 2,
@@ -80,7 +80,7 @@ const initialTasks: MockTask[] = [
     priority: "medium",
     due_date: null,
     project_id: 1,
-    assignee_id: null,
+    assignee_id: 2,
   },
 ]
 

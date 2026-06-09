@@ -63,4 +63,20 @@ describe("ProjectBoardPage", () => {
       expect(screen.queryByText("Design schema")).not.toBeInTheDocument()
     })
   })
+
+  it("filters tasks by assignee", async () => {
+    renderBoard()
+    expect(await screen.findByText("Set up CI")).toBeInTheDocument()
+    expect(screen.getByText("Design schema")).toBeInTheDocument()
+
+    const filter = screen.getByLabelText("Filter by assignee")
+    await screen.findByRole("option", { name: "Sam Lee" })
+    await userEvent.selectOptions(filter, "Sam Lee")
+
+    expect(screen.queryByText("Set up CI")).not.toBeInTheDocument()
+    expect(screen.getByText("Design schema")).toBeInTheDocument()
+
+    await userEvent.selectOptions(filter, "All assignees")
+    expect(await screen.findByText("Set up CI")).toBeInTheDocument()
+  })
 })
