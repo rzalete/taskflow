@@ -2,11 +2,13 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import {
   createTask,
+  deleteTask,
   getTasks,
   updateTask,
   type CreateTaskPayload,
   type Task,
   type TaskStatus,
+  type UpdateTaskPayload,
 } from "./tasksApi"
 
 function tasksKey(teamId: number, projectId: number) {
@@ -53,6 +55,32 @@ export function useMoveTask(teamId: number, projectId: number) {
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: key })
+    },
+  })
+}
+
+export function useUpdateTask(teamId: number, projectId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      taskId,
+      payload,
+    }: {
+      taskId: number
+      payload: UpdateTaskPayload
+    }) => updateTask(teamId, projectId, taskId, payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tasksKey(teamId, projectId) })
+    },
+  })
+}
+
+export function useDeleteTask(teamId: number, projectId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (taskId: number) => deleteTask(teamId, projectId, taskId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: tasksKey(teamId, projectId) })
     },
   })
 }

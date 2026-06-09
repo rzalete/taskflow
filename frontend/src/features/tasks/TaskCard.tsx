@@ -9,7 +9,13 @@ const priorityClass: Record<TaskPriority, string> = {
   urgent: "bg-red-100 text-red-700",
 }
 
-export function TaskCard({ task }: { task: Task }) {
+export function TaskCard({
+  task,
+  onOpen,
+}: {
+  task: Task
+  onOpen: (taskId: number) => void
+}) {
   const { attributes, listeners, setNodeRef, transform, isDragging } =
     useDraggable({ id: task.id })
 
@@ -23,6 +29,7 @@ export function TaskCard({ task }: { task: Task }) {
       style={style}
       {...attributes}
       {...listeners}
+      onClick={() => onOpen(task.id)}
       className={`cursor-grab rounded-lg border border-slate-200 bg-white p-3 shadow-sm ${
         isDragging ? "opacity-50" : ""
       }`}

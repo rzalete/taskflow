@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react"
+import { useRef, useState, type FormEvent } from "react"
 import { useParams } from "react-router"
 import {
   DndContext,
@@ -13,6 +13,8 @@ import { BoardColumn } from "./BoardColumn"
 import { TaskCard } from "./TaskCard"
 import { type TaskStatus } from "./tasksApi"
 import { useCreateTask, useMoveTask, useTasks } from "./useTasks"
+import { useMembers } from "../teams/useMembers"
+import { TaskDetailModal } from "./TaskDetailModal"
 
 const COLUMNS: { status: TaskStatus; title: string }[] = [
   { status: "backlog", title: "Backlog" },
@@ -38,6 +40,18 @@ export function ProjectBoardPage() {
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
   )
 
+  const membersQuery = useMembers(team)
+  const [selectedTaskId, setSelectedTaskId] = useState<number | null>(null)
+  const justDraggedRef = useRef(false)
+
+  const selectedTask =
+    tasksQuery.data?.find((task) => task.id === selectedTaskId) ?? null
+
+  function handleOpen(taskId: number) {
+    if (justDraggedRef.current) return
+    setSelectedTaskId(taskId)
+  }
+
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     await createTask.mutateAsync({ title })
@@ -46,12 +60,17 @@ export function ProjectBoardPage() {
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
-    if (!over) return
-    const status = over.id as TaskStatus
-    const task = tasksQuery.data?.find((t) => t.id === active.id)
-    if (task && task.status !== status) {
-      moveTask.mutate({ taskId: task.id, status })
+    if (over) {
+      const status = over.id as TaskStatus
+      const task = tasksQuery.data?.find((t) => t.id === active.id)
+      if (task && task.status !== status) {
+        moveTask.mutate({ taskId: task.id, status })
+      }
     }
+    justDraggedRef.current = true
+    window.setTimeout(() => {
+      justDraggedRef.current = false
+    }, 0)
   }
 
   return (
@@ -100,13 +119,22 @@ export function ProjectBoardPage() {
                 count={columnTasks.length}
               >
                 {columnTasks.map((task) => (
-                  <TaskCard key={task.id} task={task} />
+                  <TaskCard key={task.id} task={task} onOpen={handleOpen} />
                 ))}
               </BoardColumn>
             )
           })}
         </div>
       </DndContext>
+      {selectedTask && (
+        <TaskDetailModal
+          task={selectedTask}
+          teamId={team}
+          projectId={project}
+          members={membersQuery.data ?? []}
+          onClose={() => setSelectedTaskId(null)}
+        />
+      )}
     </div>
   )
 }
