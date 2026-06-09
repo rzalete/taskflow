@@ -5,6 +5,7 @@ import { isAxiosError } from "axios"
 import { useTeam } from "./useTeams"
 import { useCreateProject, useProjects } from "../projects/useProjects"
 import { MembersSection } from "./MembersSection"
+import { useToast } from "../../components/toast/toast-context"
 
 export function TeamPage() {
   const { teamId } = useParams()
@@ -15,16 +16,17 @@ export function TeamPage() {
   const createProject = useCreateProject(id)
 
   const [name, setName] = useState("")
-  const [error, setError] = useState<string | null>(null)
+
+  const toast = useToast()
 
   async function handleCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setError(null)
     try {
       await createProject.mutateAsync({ name })
       setName("")
+      toast.success("Project created")
     } catch (err) {
-      setError(
+      toast.error(
         isAxiosError(err) && err.response?.status === 403
           ? "Only team owners and admins can create projects."
           : "Something went wrong. Please try again.",
@@ -91,8 +93,6 @@ export function TeamPage() {
           Add
         </button>
       </form>
-
-      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
 
       <MembersSection teamId={id} />
     </div>

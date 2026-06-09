@@ -7,6 +7,7 @@ import {
   type UpdateTaskPayload,
 } from "./tasksApi"
 import { useDeleteTask, useUpdateTask } from "./useTasks"
+import { useToast } from "../../components/toast/toast-context"
 
 const PRIORITIES: TaskPriority[] = ["low", "medium", "high", "urgent"]
 
@@ -34,11 +35,10 @@ export function TaskDetailModal({
     task.assignee_id !== null ? String(task.assignee_id) : "",
   )
   const [confirmingDelete, setConfirmingDelete] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const toast = useToast()
 
   async function handleSave(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setError(null)
     const payload: UpdateTaskPayload = {
       title: title.trim(),
       description: description.trim() === "" ? null : description.trim(),
@@ -48,23 +48,24 @@ export function TaskDetailModal({
     }
     try {
       await updateTask.mutateAsync({ taskId: task.id, payload })
+      toast.success("Task updated")
       onClose()
     } catch {
-      setError("Couldn't save changes. Please try again.")
+      toast.error("Couldn't save changes. Please try again.")
     }
   }
 
   async function handleDelete() {
-    setError(null)
     try {
       await deleteTask.mutateAsync(task.id)
+      toast.success("Task deleted")
       onClose()
     } catch (err) {
       const status =
         typeof err === "object" && err !== null && "response" in err
           ? (err as { response?: { status?: number } }).response?.status
           : undefined
-      setError(
+      toast.error(
         status === 403
           ? "Only an owner or admin can delete a task."
           : "Couldn't delete the task. Please try again.",
@@ -190,8 +191,6 @@ export function TaskDetailModal({
               ))}
             </select>
           </div>
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
 
           <div className="flex items-center justify-between pt-2">
             {confirmingDelete ? (
