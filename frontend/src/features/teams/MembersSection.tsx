@@ -9,6 +9,7 @@ import {
   useRemoveMember,
   useUpdateMemberRole,
 } from "./useMembers"
+import { useToast } from "../../components/toast/toast-context"
 
 const ROLES: Role[] = ["member", "admin", "owner"]
 
@@ -32,31 +33,31 @@ export function MembersSection({ teamId }: { teamId: number }) {
 
   const [email, setEmail] = useState("")
   const [role, setRole] = useState<Role>("member")
-  const [error, setError] = useState<string | null>(null)
   const [confirmingId, setConfirmingId] = useState<number | null>(null)
 
   const members = membersQuery.data ?? []
   const currentRole = members.find((m) => m.user_id === user?.id)?.role
   const canManage = currentRole === "owner" || currentRole === "admin"
+  const toast = useToast()
 
   async function handleAdd(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setError(null)
     try {
       await addMember.mutateAsync({ email, role })
       setEmail("")
       setRole("member")
+      toast.success("Member added")
     } catch (err) {
-      setError(addErrorMessage(err))
+      toast.error(addErrorMessage(err))
     }
   }
 
   async function handleRoleChange(userId: number, nextRole: Role) {
-    setError(null)
     try {
       await updateRole.mutateAsync({ userId, role: nextRole })
+      toast.success("Role updated")
     } catch (err) {
-      setError(
+      toast.error(
         isAxiosError(err) && err.response?.status === 400
           ? "You can't demote the last owner."
           : "Couldn't change that member's role.",
@@ -65,11 +66,11 @@ export function MembersSection({ teamId }: { teamId: number }) {
   }
 
   async function handleRemove(userId: number) {
-    setError(null)
     try {
       await removeMember.mutateAsync(userId)
+      toast.success("Member removed")
     } catch (err) {
-      setError(
+      toast.error(
         isAxiosError(err) && err.response?.status === 400
           ? "You can't remove the last owner."
           : "Couldn't remove that member.",
@@ -182,8 +183,6 @@ export function MembersSection({ teamId }: { teamId: number }) {
           </button>
         </form>
       )}
-
-      {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
     </section>
   )
 }
