@@ -9,7 +9,20 @@ const teams = [
   { id: 2, name: "Marketing" },
 ]
 
-const members = [
+const userDirectory = [
+  { user_id: 1, email: "ali@example.com", full_name: "Ali Reza" },
+  { user_id: 2, email: "sam@example.com", full_name: "Sam Lee" },
+  { user_id: 3, email: "riya@example.com", full_name: "Riya Patel" },
+]
+
+type MockMember = {
+  user_id: number
+  email: string
+  full_name: string
+  role: "owner" | "admin" | "member"
+}
+
+const initialMembers: MockMember[] = [
   {
     user_id: 1,
     email: "ali@example.com",
@@ -23,6 +36,8 @@ const members = [
     role: "member",
   },
 ]
+
+let members: MockMember[] = [...initialMembers]
 
 type MockProject = {
   id: number
@@ -75,6 +90,7 @@ let tasks: MockTask[] = [...initialTasks]
 export function resetMockData() {
   projects = [...initialProjects]
   tasks = [...initialTasks]
+  members = [...initialMembers]
 }
 
 export const handlers = [
@@ -177,4 +193,41 @@ export const handlers = [
       return new HttpResponse(null, { status: 204 })
     },
   ),
+  http.get(`${API}/teams/:teamId/members`, () => HttpResponse.json(members)),
+  http.post(`${API}/teams/:teamId/members`, async ({ request }) => {
+    const body = (await request.json()) as {
+      email: string
+      role: MockMember["role"]
+    }
+    const user = userDirectory.find((u) => u.email === body.email)
+    if (!user) {
+      return new HttpResponse(null, { status: 404 })
+    }
+    if (members.some((m) => m.user_id === user.user_id)) {
+      return new HttpResponse(null, { status: 400 })
+    }
+    const newMember: MockMember = {
+      user_id: user.user_id,
+      email: user.email,
+      full_name: user.full_name,
+      role: body.role,
+    }
+    members = [...members, newMember]
+    return HttpResponse.json(newMember, { status: 201 })
+  }),
+  http.patch(
+    `${API}/teams/:teamId/members/:userId`,
+    async ({ params, request }) => {
+      const body = (await request.json()) as { role: MockMember["role"] }
+      members = members.map((m) =>
+        m.user_id === Number(params.userId) ? { ...m, role: body.role } : m,
+      )
+      const updated = members.find((m) => m.user_id === Number(params.userId))
+      return HttpResponse.json(updated)
+    },
+  ),
+  http.delete(`${API}/teams/:teamId/members/:userId`, ({ params }) => {
+    members = members.filter((m) => m.user_id !== Number(params.userId))
+    return new HttpResponse(null, { status: 204 })
+  }),
 ]

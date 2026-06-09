@@ -4,6 +4,7 @@ import { isAxiosError } from "axios"
 
 import { useTeam } from "./useTeams"
 import { useCreateProject, useProjects } from "../projects/useProjects"
+import { MembersSection } from "./MembersSection"
 
 export function TeamPage() {
   const { teamId } = useParams()
@@ -92,6 +93,8 @@ export function TeamPage() {
       </form>
 
       {error && <p className="mt-2 text-sm text-red-700">{error}</p>}
+
+      <MembersSection teamId={id} />
     </div>
   )
 }
