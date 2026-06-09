@@ -1,5 +1,7 @@
+import { Suspense } from "react"
 import { Link, NavLink, Outlet } from "react-router"
 
+import { RouteFallback } from "./RouteFallback"
 import { useAuth } from "../features/auth/auth-context"
 import { HealthStatus } from "../features/health/HealthStatus"
 import { useTeams } from "../features/teams/useTeams"
@@ -73,7 +75,9 @@ export function AppLayout() {
         </header>
 
         <main className="flex-1 px-6 py-8">
-          <Outlet />
+          <Suspense fallback={<RouteFallback />}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>
