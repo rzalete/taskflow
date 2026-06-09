@@ -1,12 +1,20 @@
-import { HealthStatus } from "./features/health/HealthStatus"
+import { Navigate, Route, Routes } from "react-router"
+
+import { LoginPage } from "./features/auth/LoginPage"
+import { ProtectedRoute } from "./features/auth/ProtectedRoute"
+import { RegisterPage } from "./features/auth/RegisterPage"
+import { DashboardPage } from "./features/dashboard/DashboardPage"
 
 function App() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-slate-50 text-slate-900">
-      <h1 className="text-4xl font-bold tracking-tight">Taskflow</h1>
-      <p className="text-slate-500">Project management, done right.</p>
-      <HealthStatus />
-    </main>
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route element={<ProtectedRoute />}>
+        <Route path="/" element={<DashboardPage />} />
+      </Route>
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   )
 }
 
