@@ -9,6 +9,21 @@ const teams = [
   { id: 2, name: "Marketing" },
 ]
 
+const members = [
+  {
+    user_id: 1,
+    email: "ali@example.com",
+    full_name: "Ali Reza",
+    role: "owner",
+  },
+  {
+    user_id: 2,
+    email: "sam@example.com",
+    full_name: "Sam Lee",
+    role: "member",
+  },
+]
+
 type MockProject = {
   id: number
   name: string
@@ -80,6 +95,9 @@ export const handlers = [
       ? HttpResponse.json(team)
       : new HttpResponse(null, { status: 404 })
   }),
+
+  http.get(`${API}/teams/:teamId/members`, () => HttpResponse.json(members)),
+
   http.post(`${API}/teams`, async ({ request }) => {
     const body = (await request.json()) as { name: string }
     return HttpResponse.json(
@@ -150,6 +168,13 @@ export const handlers = [
       )
       const updated = tasks.find((t) => t.id === Number(params.taskId))
       return HttpResponse.json(updated)
+    },
+  ),
+  http.delete(
+    `${API}/teams/:teamId/projects/:projectId/tasks/:taskId`,
+    ({ params }) => {
+      tasks = tasks.filter((t) => t.id !== Number(params.taskId))
+      return new HttpResponse(null, { status: 204 })
     },
   ),
 ]

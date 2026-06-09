@@ -70,3 +70,11 @@ export async function updateTask(
   )
   return data
 }
+
+export async function deleteTask(
+  teamId: number,
+  projectId: number,
+  taskId: number,
+): Promise<void> {
+  await api.delete(`/teams/${teamId}/projects/${projectId}/tasks/${taskId}`)
+}
