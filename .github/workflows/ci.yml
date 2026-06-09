@@ -66,5 +66,8 @@ jobs:
       - name: Type check (tsc)
         run: pnpm typecheck
 
+      - name: Run tests (vitest)
+        run: pnpm test
+
       - name: Build (vite)
         run: pnpm build
