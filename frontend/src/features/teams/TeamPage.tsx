@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from "react"
-import { useParams } from "react-router"
+import { Link, useParams } from "react-router"
 import { isAxiosError } from "axios"
 
 import { useTeam } from "./useTeams"
@@ -56,16 +56,18 @@ export function TeamPage() {
 
         <ul className="mt-3 space-y-2">
           {projectsQuery.data?.map((project) => (
-            <li
-              key={project.id}
-              className="rounded-lg border border-slate-200 bg-white p-4"
-            >
-              <p className="font-medium text-slate-900">{project.name}</p>
-              {project.description && (
-                <p className="mt-1 text-sm text-slate-500">
-                  {project.description}
-                </p>
-              )}
+            <li key={project.id}>
+              <Link
+                to={`/teams/${id}/projects/${project.id}`}
+                className="block rounded-lg border border-slate-200 bg-white p-4 hover:border-slate-300 hover:shadow-sm"
+              >
+                <p className="font-medium text-slate-900">{project.name}</p>
+                {project.description && (
+                  <p className="mt-1 text-sm text-slate-500">
+                    {project.description}
+                  </p>
+                )}
+              </Link>
             </li>
           ))}
         </ul>

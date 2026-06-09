@@ -7,6 +7,7 @@ import { RegisterPage } from "./features/auth/RegisterPage"
 import { DashboardPage } from "./features/dashboard/DashboardPage"
 import { NewTeamPage } from "./features/teams/NewTeamPage"
 import { TeamPage } from "./features/teams/TeamPage"
+import { ProjectBoardPage } from "./features/tasks/ProjectBoardPage"
 
 function App() {
   return (
@@ -18,6 +19,10 @@ function App() {
           <Route path="/" element={<DashboardPage />} />
           <Route path="/teams/new" element={<NewTeamPage />} />
           <Route path="/teams/:teamId" element={<TeamPage />} />
+          <Route
+            path="/teams/:teamId/projects/:projectId"
+            element={<ProjectBoardPage />}
+          />
         </Route>
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
