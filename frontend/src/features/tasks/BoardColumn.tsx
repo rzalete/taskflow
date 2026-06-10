@@ -1,15 +1,18 @@
 import { type ReactNode } from "react"
 import { useDroppable } from "@dnd-kit/core"
+import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable"
 
 export function BoardColumn({
   id,
   title,
   count,
+  taskIds,
   children,
 }: {
   id: string
   title: string
   count: number
+  taskIds: number[]
   children: ReactNode
 }) {
   const { setNodeRef, isOver } = useDroppable({ id })
@@ -27,7 +30,9 @@ export function BoardColumn({
           {count}
         </span>
       </h3>
-      <div className="flex flex-1 flex-col gap-2">{children}</div>
+      <SortableContext items={taskIds} strategy={verticalListSortingStrategy}>
+        <div className="flex flex-1 flex-col gap-2">{children}</div>
+      </SortableContext>
     </div>
   )
 }

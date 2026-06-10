@@ -1,6 +1,7 @@
 import { useRef, useState, type FormEvent } from "react"
 import { useParams } from "react-router"
 import {
+  closestCorners,
   DndContext,
   PointerSensor,
   useSensor,
@@ -67,17 +68,52 @@ export function ProjectBoardPage() {
 
   function handleDragEnd(event: DragEndEvent) {
     const { active, over } = event
-    if (over) {
-      const status = over.id as TaskStatus
-      const task = tasksQuery.data?.find((t) => t.id === active.id)
-      if (task && task.status !== status) {
-        moveTask.mutate({ taskId: task.id, status })
-      }
-    }
     justDraggedRef.current = true
     window.setTimeout(() => {
       justDraggedRef.current = false
     }, 0)
+    if (!over) return
+
+    const activeId = Number(active.id)
+    const tasks = tasksQuery.data ?? []
+    const activeTask = tasks.find((task) => task.id === activeId)
+    if (!activeTask) return
+
+    // `over` is either a column (dropped on empty space) or another card.
+    const overColumn = COLUMNS.find((column) => column.status === over.id)
+    const overTask = overColumn
+      ? undefined
+      : tasks.find((task) => task.id === Number(over.id))
+
+    let destStatus: TaskStatus
+    if (overColumn) {
+      destStatus = overColumn.status
+    } else if (overTask) {
+      destStatus = overTask.status
+    } else {
+      return
+    }
+
+    // Compute the target index against the FULL destination column (sorted by
+    // position), so the drop is correct even with an assignee filter active.
+    const columnIds = tasks
+      .filter((task) => task.status === destStatus)
+      .sort((a, b) => a.position - b.position)
+      .map((task) => task.id)
+
+    let position: number
+    if (destStatus === activeTask.status) {
+      const oldIndex = columnIds.indexOf(activeId)
+      const newIndex = overTask
+        ? columnIds.indexOf(overTask.id)
+        : columnIds.length - 1
+      if (oldIndex === newIndex) return
+      position = newIndex
+    } else {
+      position = overTask ? columnIds.indexOf(overTask.id) : columnIds.length
+    }
+
+    moveTask.mutate({ taskId: activeId, status: destStatus, position })
   }
 
   return (
@@ -129,18 +165,23 @@ export function ProjectBoardPage() {
         <p className="mt-4 text-sm text-red-600">Couldn't load tasks.</p>
       )}
 
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCorners}
+        onDragEnd={handleDragEnd}
+      >
         <div className="mt-6 flex gap-4 overflow-x-auto pb-4">
           {COLUMNS.map((column) => {
-            const columnTasks = visibleTasks.filter(
-              (task) => task.status === column.status,
-            )
+            const columnTasks = visibleTasks
+              .filter((task) => task.status === column.status)
+              .sort((a, b) => a.position - b.position)
             return (
               <BoardColumn
                 key={column.status}
                 id={column.status}
                 title={column.title}
                 count={columnTasks.length}
+                taskIds={columnTasks.map((task) => task.id)}
               >
                 {columnTasks.map((task) => (
                   <TaskCard key={task.id} task={task} onOpen={handleOpen} />
