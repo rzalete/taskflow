@@ -1,6 +1,6 @@
 from datetime import date
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.models import TaskPriority, TaskStatus
 
@@ -34,3 +34,9 @@ class TaskRead(BaseModel):
     due_date: date | None
     project_id: int
     assignee_id: int | None
+    position: int
+
+
+class TaskMove(BaseModel):
+    status: TaskStatus
+    position: int = Field(ge=0)

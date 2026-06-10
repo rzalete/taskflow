@@ -177,3 +177,100 @@ def test_get_unknown_task_returns_404(client: TestClient) -> None:
     base = f"/teams/{team_id}/projects/{project_id}/tasks"
     response = client.get(f"{base}/999", headers=owner)
     assert response.status_code == 404
+
+
+def test_create_task_appends_to_end_of_its_column(client: TestClient) -> None:
+    owner = _token(client, "owner@example.com")
+    team_id = _create_team(client, owner)
+    project_id = _create_project(client, team_id, owner)
+    base = f"/teams/{team_id}/projects/{project_id}/tasks"
+
+    first = client.post(
+        base, json={"title": "A", "status": "todo"}, headers=owner
+    ).json()
+    second = client.post(
+        base, json={"title": "B", "status": "todo"}, headers=owner
+    ).json()
+    other_column = client.post(
+        base, json={"title": "C", "status": "done"}, headers=owner
+    ).json()
+
+    assert first["position"] == 0
+    assert second["position"] == 1
+    # Separate column keeps its own sequence.
+    assert other_column["position"] == 0
+
+
+def test_move_task_reorders_within_a_column(client: TestClient) -> None:
+    owner = _token(client, "owner@example.com")
+    team_id = _create_team(client, owner)
+    project_id = _create_project(client, team_id, owner)
+    base = f"/teams/{team_id}/projects/{project_id}/tasks"
+    client.post(base, json={"title": "A", "status": "todo"}, headers=owner)
+    client.post(base, json={"title": "B", "status": "todo"}, headers=owner)
+    c_id = client.post(
+        base, json={"title": "C", "status": "todo"}, headers=owner
+    ).json()["id"]
+
+    moved = client.patch(
+        f"{base}/{c_id}/move",
+        json={"status": "todo", "position": 0},
+        headers=owner,
+    )
+    assert moved.status_code == 200
+    assert moved.json()["position"] == 0
+
+    todo = client.get(base, params={"status": "todo"}, headers=owner).json()
+    assert [(t["title"], t["position"]) for t in todo] == [
+        ("C", 0),
+        ("A", 1),
+        ("B", 2),
+    ]
+
+
+def test_move_task_to_another_column_sets_status_and_reindexes(
+    client: TestClient,
+) -> None:
+    owner = _token(client, "owner@example.com")
+    team_id = _create_team(client, owner)
+    project_id = _create_project(client, team_id, owner)
+    base = f"/teams/{team_id}/projects/{project_id}/tasks"
+    a_id = client.post(
+        base, json={"title": "A", "status": "todo"}, headers=owner
+    ).json()["id"]
+    client.post(base, json={"title": "B", "status": "todo"}, headers=owner)
+    client.post(base, json={"title": "D", "status": "done"}, headers=owner)
+
+    moved = client.patch(
+        f"{base}/{a_id}/move",
+        json={"status": "done", "position": 0},
+        headers=owner,
+    ).json()
+    assert moved["status"] == "done"
+    assert moved["position"] == 0
+
+    # Source column closed its gap.
+    todo = client.get(base, params={"status": "todo"}, headers=owner).json()
+    assert [(t["title"], t["position"]) for t in todo] == [("B", 0)]
+    # Destination column re-indexed with A in front.
+    done = client.get(base, params={"status": "done"}, headers=owner).json()
+    assert [(t["title"], t["position"]) for t in done] == [("A", 0), ("D", 1)]
+
+
+def test_member_can_move_task(client: TestClient) -> None:
+    owner = _token(client, "owner@example.com")
+    team_id = _create_team(client, owner)
+    project_id = _create_project(client, team_id, owner)
+    member = _add_member(client, team_id, owner, "member@example.com")
+    base = f"/teams/{team_id}/projects/{project_id}/tasks"
+    task_id = client.post(
+        base, json={"title": "Move me", "status": "todo"}, headers=owner
+    ).json()["id"]
+
+    response = client.patch(
+        f"{base}/{task_id}/move",
+        json={"status": "in_progress", "position": 0},
+        headers=member,
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "in_progress"

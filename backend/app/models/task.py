@@ -42,7 +42,7 @@ class Task(Base, TimestampMixin):
         Enum(TaskPriority, name="task_priority"), default=TaskPriority.medium
     )
     due_date: Mapped[date | None] = mapped_column(Date(), default=None)
-
+    position: Mapped[int] = mapped_column(default=0)
     project_id: Mapped[int] = mapped_column(
         ForeignKey("projects.id", ondelete="CASCADE")
     )
