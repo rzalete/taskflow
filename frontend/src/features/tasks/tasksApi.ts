@@ -18,6 +18,7 @@ export interface Task {
   due_date: string | null
   project_id: number
   assignee_id: number | null
+  position: number
 }
 
 export interface CreateTaskPayload {
@@ -66,6 +67,24 @@ export async function updateTask(
 ): Promise<Task> {
   const { data } = await api.patch<Task>(
     `/teams/${teamId}/projects/${projectId}/tasks/${taskId}`,
+    payload,
+  )
+  return data
+}
+
+export interface MoveTaskPayload {
+  status: TaskStatus
+  position: number
+}
+
+export async function moveTask(
+  teamId: number,
+  projectId: number,
+  taskId: number,
+  payload: MoveTaskPayload,
+): Promise<Task> {
+  const { data } = await api.patch<Task>(
+    `/teams/${teamId}/projects/${projectId}/tasks/${taskId}/move`,
     payload,
   )
   return data

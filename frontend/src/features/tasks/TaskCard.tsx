@@ -1,4 +1,5 @@
-import { useDraggable } from "@dnd-kit/core"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 
 import { type Task, type TaskPriority } from "./tasksApi"
 
@@ -16,12 +17,19 @@ export function TaskCard({
   task: Task
   onOpen: (taskId: number) => void
 }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } =
-    useDraggable({ id: task.id })
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: task.id })
 
-  const style = transform
-    ? { transform: `translate3d(${transform.x}px, ${transform.y}px, 0)` }
-    : undefined
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    transition,
+  }
 
   return (
     <div

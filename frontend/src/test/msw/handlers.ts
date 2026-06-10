@@ -59,6 +59,7 @@ type MockTask = {
   due_date: string | null
   project_id: number
   assignee_id: number | null
+  position: number
 }
 
 const initialTasks: MockTask[] = [
@@ -71,6 +72,7 @@ const initialTasks: MockTask[] = [
     due_date: null,
     project_id: 1,
     assignee_id: 1,
+    position: 0,
   },
   {
     id: 2,
@@ -81,6 +83,7 @@ const initialTasks: MockTask[] = [
     due_date: null,
     project_id: 1,
     assignee_id: 2,
+    position: 0,
   },
 ]
 
@@ -150,7 +153,9 @@ export const handlers = [
 
   http.get(`${API}/teams/:teamId/projects/:projectId/tasks`, ({ params }) =>
     HttpResponse.json(
-      tasks.filter((t) => t.project_id === Number(params.projectId)),
+      tasks
+        .filter((t) => t.project_id === Number(params.projectId))
+        .sort((a, b) => a.position - b.position || a.id - b.id),
     ),
   ),
   http.post(
@@ -161,15 +166,23 @@ export const handlers = [
         status?: string
         priority?: string
       }
+      const status = body.status ?? "backlog"
+      const last = tasks
+        .filter(
+          (t) =>
+            t.project_id === Number(params.projectId) && t.status === status,
+        )
+        .reduce((max, t) => Math.max(max, t.position), -1)
       const task: MockTask = {
         id: tasks.length + 1,
         title: body.title,
         description: null,
-        status: body.status ?? "backlog",
+        status,
         priority: body.priority ?? "medium",
         due_date: null,
         project_id: Number(params.projectId),
         assignee_id: null,
+        position: last + 1,
       }
       tasks = [...tasks, task]
       return HttpResponse.json(task, { status: 201 })
@@ -184,6 +197,40 @@ export const handlers = [
       )
       const updated = tasks.find((t) => t.id === Number(params.taskId))
       return HttpResponse.json(updated)
+    },
+  ),
+  http.patch(
+    `${API}/teams/:teamId/projects/:projectId/tasks/:taskId/move`,
+    async ({ params, request }) => {
+      const body = (await request.json()) as {
+        status: string
+        position: number
+      }
+      const taskId = Number(params.taskId)
+      const moved = tasks.find((t) => t.id === taskId)
+      if (!moved) return new HttpResponse(null, { status: 404 })
+
+      const sourceStatus = moved.status
+      moved.status = body.status
+
+      const destination = tasks
+        .filter((t) => t.status === body.status && t.id !== taskId)
+        .sort((a, b) => a.position - b.position)
+      const index = Math.max(0, Math.min(body.position, destination.length))
+      destination.splice(index, 0, moved)
+      destination.forEach((t, i) => {
+        t.position = i
+      })
+
+      if (sourceStatus !== body.status) {
+        tasks
+          .filter((t) => t.status === sourceStatus && t.id !== taskId)
+          .sort((a, b) => a.position - b.position)
+          .forEach((t, i) => {
+            t.position = i
+          })
+      }
+      return HttpResponse.json(moved)
     },
   ),
   http.delete(
