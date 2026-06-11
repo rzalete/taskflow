@@ -79,4 +79,30 @@ describe("ProjectBoardPage", () => {
     await userEvent.selectOptions(filter, "All assignees")
     expect(await screen.findByText("Set up CI")).toBeInTheDocument()
   })
+  it("switches to the list view and filters by status", async () => {
+    renderBoard()
+    expect(await screen.findByText("Set up CI")).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole("button", { name: "List" }))
+
+    expect(screen.getByText("Set up CI")).toBeInTheDocument()
+    expect(screen.getByText("Design schema")).toBeInTheDocument()
+
+    await userEvent.selectOptions(
+      screen.getByLabelText("Filter by status"),
+      "To do",
+    )
+    expect(screen.getByText("Set up CI")).toBeInTheDocument()
+    expect(screen.queryByText("Design schema")).not.toBeInTheDocument()
+  })
+
+  it("opens a task from a list row", async () => {
+    renderBoard()
+    await screen.findByText("Set up CI")
+
+    await userEvent.click(screen.getByRole("button", { name: "List" }))
+    await userEvent.click(screen.getByText("Set up CI"))
+
+    expect(await screen.findByDisplayValue("Set up CI")).toBeInTheDocument()
+  })
 })
