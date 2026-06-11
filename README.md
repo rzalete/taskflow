@@ -42,3 +42,15 @@ cp .env.example .env
 ## License
 
 Released under the MIT License.
+
+## Deployment
+
+Deployed on [Render](https://render.com) from `render.yaml` (Blueprint):
+
+- **Web (SPA):** https://taskflow-web.onrender.com
+- **API:** https://taskflow-api.onrender.com
+- **Database:** managed PostgreSQL
+
+The API runs database migrations automatically on each deploy. Note: the free
+tier sleeps after ~15 minutes of inactivity, so the first request may take up
+to a minute to wake the service.
