@@ -12,18 +12,15 @@ import {
 import { useProject } from "../projects/useProjects"
 import { BoardColumn } from "./BoardColumn"
 import { TaskCard } from "./TaskCard"
-import { type TaskStatus } from "./tasksApi"
+import { STATUS_LABELS, type TaskStatus } from "./tasksApi"
 import { useCreateTask, useMoveTask, useTasks } from "./useTasks"
 import { useMembers } from "../teams/useMembers"
 import { TaskDetailModal } from "./TaskDetailModal"
+import { ProjectTaskList } from "./ProjectTaskList"
 
-const COLUMNS: { status: TaskStatus; title: string }[] = [
-  { status: "backlog", title: "Backlog" },
-  { status: "todo", title: "To do" },
-  { status: "in_progress", title: "In progress" },
-  { status: "in_review", title: "In review" },
-  { status: "done", title: "Done" },
-]
+const COLUMNS: { status: TaskStatus; title: string }[] = (
+  ["backlog", "todo", "in_progress", "in_review", "done"] as const
+).map((status) => ({ status, title: STATUS_LABELS[status] }))
 
 export function ProjectBoardPage() {
   const { teamId, projectId } = useParams()
@@ -36,6 +33,8 @@ export function ProjectBoardPage() {
   const moveTask = useMoveTask(team, project)
 
   const [title, setTitle] = useState("")
+  const [view, setView] = useState<"board" | "list">("board")
+  const [statusFilter, setStatusFilter] = useState<string>("all")
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
@@ -54,6 +53,16 @@ export function ProjectBoardPage() {
     if (assigneeFilter === "unassigned") return task.assignee_id === null
     return task.assignee_id === Number(assigneeFilter)
   })
+
+  const listTasks = visibleTasks.filter(
+    (task) => statusFilter === "all" || task.status === statusFilter,
+  )
+
+  const memberName = (assigneeId: number | null) => {
+    if (assigneeId === null) return "Unassigned"
+    const member = membersQuery.data?.find((m) => m.user_id === assigneeId)
+    return member?.full_name ?? `User ${assigneeId}`
+  }
 
   function handleOpen(taskId: number) {
     if (justDraggedRef.current) return
@@ -143,54 +152,110 @@ export function ProjectBoardPage() {
         </button>
       </form>
 
-      <div className="mt-4 flex items-center gap-2">
-        <span className="text-sm text-slate-600">Assignee:</span>
-        <select
-          aria-label="Filter by assignee"
-          value={assigneeFilter}
-          onChange={(event) => setAssigneeFilter(event.target.value)}
-          className="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
-        >
-          <option value="all">All assignees</option>
-          <option value="unassigned">Unassigned</option>
-          {(membersQuery.data ?? []).map((member) => (
-            <option key={member.user_id} value={String(member.user_id)}>
-              {member.full_name}
-            </option>
-          ))}
-        </select>
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-1 rounded-md border border-slate-300 p-0.5">
+          <button
+            type="button"
+            onClick={() => setView("board")}
+            aria-pressed={view === "board"}
+            className={`rounded px-3 py-1 text-sm font-medium ${
+              view === "board"
+                ? "bg-slate-900 text-white"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            Board
+          </button>
+          <button
+            type="button"
+            onClick={() => setView("list")}
+            aria-pressed={view === "list"}
+            className={`rounded px-3 py-1 text-sm font-medium ${
+              view === "list"
+                ? "bg-slate-900 text-white"
+                : "text-slate-600 hover:bg-slate-100"
+            }`}
+          >
+            List
+          </button>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-slate-600">Assignee:</span>
+          <select
+            aria-label="Filter by assignee"
+            value={assigneeFilter}
+            onChange={(event) => setAssigneeFilter(event.target.value)}
+            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+          >
+            <option value="all">All assignees</option>
+            <option value="unassigned">Unassigned</option>
+            {(membersQuery.data ?? []).map((member) => (
+              <option key={member.user_id} value={String(member.user_id)}>
+                {member.full_name}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        {view === "list" && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-slate-600">Status:</span>
+            <select
+              aria-label="Filter by status"
+              value={statusFilter}
+              onChange={(event) => setStatusFilter(event.target.value)}
+              className="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+            >
+              <option value="all">All statuses</option>
+              {COLUMNS.map((column) => (
+                <option key={column.status} value={column.status}>
+                  {column.title}
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       {tasksQuery.isError && (
         <p className="mt-4 text-sm text-red-600">Couldn't load tasks.</p>
       )}
 
-      <DndContext
-        sensors={sensors}
-        collisionDetection={closestCorners}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="mt-6 flex gap-4 overflow-x-auto pb-4">
-          {COLUMNS.map((column) => {
-            const columnTasks = visibleTasks
-              .filter((task) => task.status === column.status)
-              .sort((a, b) => a.position - b.position)
-            return (
-              <BoardColumn
-                key={column.status}
-                id={column.status}
-                title={column.title}
-                count={columnTasks.length}
-                taskIds={columnTasks.map((task) => task.id)}
-              >
-                {columnTasks.map((task) => (
-                  <TaskCard key={task.id} task={task} onOpen={handleOpen} />
-                ))}
-              </BoardColumn>
-            )
-          })}
-        </div>
-      </DndContext>
+      {view === "board" ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCorners}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="mt-6 flex gap-4 overflow-x-auto pb-4">
+            {COLUMNS.map((column) => {
+              const columnTasks = visibleTasks
+                .filter((task) => task.status === column.status)
+                .sort((a, b) => a.position - b.position)
+              return (
+                <BoardColumn
+                  key={column.status}
+                  id={column.status}
+                  title={column.title}
+                  count={columnTasks.length}
+                  taskIds={columnTasks.map((task) => task.id)}
+                >
+                  {columnTasks.map((task) => (
+                    <TaskCard key={task.id} task={task} onOpen={handleOpen} />
+                  ))}
+                </BoardColumn>
+              )
+            })}
+          </div>
+        </DndContext>
+      ) : (
+        <ProjectTaskList
+          tasks={listTasks}
+          getAssigneeName={memberName}
+          onOpen={handleOpen}
+        />
+      )}
       {selectedTask && (
         <TaskDetailModal
           task={selectedTask}

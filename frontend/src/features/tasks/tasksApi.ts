@@ -37,6 +37,21 @@ export interface UpdateTaskPayload {
   assignee_id?: number | null
 }
 
+export const STATUS_LABELS: Record<TaskStatus, string> = {
+  backlog: "Backlog",
+  todo: "To do",
+  in_progress: "In progress",
+  in_review: "In review",
+  done: "Done",
+}
+
+export const PRIORITY_CLASSES: Record<TaskPriority, string> = {
+  low: "bg-slate-100 text-slate-600",
+  medium: "bg-blue-100 text-blue-700",
+  high: "bg-amber-100 text-amber-700",
+  urgent: "bg-red-100 text-red-700",
+}
+
 export async function getTasks(
   teamId: number,
   projectId: number,
