@@ -24,5 +24,22 @@ class Settings(BaseSettings):
             return [origin.strip() for origin in value.split(",") if origin.strip()]
         return value
 
+    @field_validator("database_url", mode="after")
+    @classmethod
+    def _use_psycopg_driver(cls, value: str) -> str:
+        """Normalize a Postgres URL to the psycopg 3 driver.
+
+        Managed hosts often inject ``postgres://`` or ``postgresql://``;
+        SQLAlchemy 2.0 rejects the former outright and defaults the latter
+        to psycopg2. Rewrite both to ``postgresql+psycopg://`` so deploys
+        work unedited. SQLite and any already-qualified driver URL are left
+        untouched.
+        """
+        if value.startswith("postgres://"):
+            value = "postgresql://" + value[len("postgres://") :]
+        if value.startswith("postgresql://"):
+            value = "postgresql+psycopg://" + value[len("postgresql://") :]
+        return value
+
 
 settings = Settings()
