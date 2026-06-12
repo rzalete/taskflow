@@ -52,6 +52,21 @@ export const PRIORITY_CLASSES: Record<TaskPriority, string> = {
   urgent: "bg-red-100 text-red-700",
 }
 
+export const PRIORITY_LABELS: Record<TaskPriority, string> = {
+  low: "Low",
+  medium: "Medium",
+  high: "High",
+  urgent: "Urgent",
+}
+
+export const STATUS_STYLES: Record<TaskStatus, string> = {
+  backlog: "bg-slate-100 text-slate-600",
+  todo: "bg-slate-100 text-slate-700",
+  in_progress: "bg-blue-100 text-blue-700",
+  in_review: "bg-amber-100 text-amber-700",
+  done: "bg-green-100 text-green-700",
+}
+
 export async function getTasks(
   teamId: number,
   projectId: number,
