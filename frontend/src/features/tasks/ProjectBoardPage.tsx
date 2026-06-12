@@ -242,7 +242,12 @@ export function ProjectBoardPage() {
                   taskIds={columnTasks.map((task) => task.id)}
                 >
                   {columnTasks.map((task) => (
-                    <TaskCard key={task.id} task={task} onOpen={handleOpen} />
+                    <TaskCard
+                      key={task.id}
+                      task={task}
+                      assigneeName={memberName(task.assignee_id)}
+                      onOpen={handleOpen}
+                    />
                   ))}
                 </BoardColumn>
               )
