@@ -12,6 +12,7 @@ import {
 import { useProject } from "../projects/useProjects"
 import { BoardColumn } from "./BoardColumn"
 import { TaskCard } from "./TaskCard"
+import { TaskCardSkeleton } from "./TaskCardSkeleton"
 import { STATUS_LABELS, type TaskStatus } from "./tasksApi"
 import { useCreateTask, useMoveTask, useTasks } from "./useTasks"
 import { useMembers } from "../teams/useMembers"
@@ -240,15 +241,20 @@ export function ProjectBoardPage() {
                   title={column.title}
                   count={columnTasks.length}
                   taskIds={columnTasks.map((task) => task.id)}
+                  loading={tasksQuery.isPending}
                 >
-                  {columnTasks.map((task) => (
-                    <TaskCard
-                      key={task.id}
-                      task={task}
-                      assigneeName={memberName(task.assignee_id)}
-                      onOpen={handleOpen}
-                    />
-                  ))}
+                  {tasksQuery.isPending
+                    ? Array.from({ length: 3 }).map((_, index) => (
+                        <TaskCardSkeleton key={index} />
+                      ))
+                    : columnTasks.map((task) => (
+                        <TaskCard
+                          key={task.id}
+                          task={task}
+                          assigneeName={memberName(task.assignee_id)}
+                          onOpen={handleOpen}
+                        />
+                      ))}
                 </BoardColumn>
               )
             })}

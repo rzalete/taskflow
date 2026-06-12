@@ -105,4 +105,21 @@ describe("ProjectBoardPage", () => {
 
     expect(await screen.findByDisplayValue("Set up CI")).toBeInTheDocument()
   })
+  it("shows skeletons while loading, then renders tasks", async () => {
+    renderBoard()
+    // First paint: the tasks query is still pending, so each column renders
+    // skeleton cards instead of real tasks.
+    expect(screen.getAllByTestId("task-skeleton").length).toBeGreaterThan(0)
+    // Once the tasks resolve, the skeletons are replaced by real cards.
+    expect(await screen.findByText("Set up CI")).toBeInTheDocument()
+    expect(screen.queryByTestId("task-skeleton")).not.toBeInTheDocument()
+  })
+
+  it("shows an empty-column placeholder for a column with no tasks", async () => {
+    renderBoard()
+    // Wait for the load to finish; with only a couple of seeded tasks, at
+    // least one of the five columns is empty and shows the placeholder.
+    await screen.findByText("Set up CI")
+    expect(screen.getAllByText("No tasks").length).toBeGreaterThan(0)
+  })
 })
