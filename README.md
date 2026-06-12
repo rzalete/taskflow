@@ -1,44 +1,100 @@
 # Taskflow
 
-> A full-stack project management system for individuals and small teams. Plan work, organize projects, and track progress on a clean task board.
+[![CI](https://github.com/rzalete/taskflow/actions/workflows/ci.yml/badge.svg)](https://github.com/rzalete/taskflow/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**Status:** Early development
+Taskflow is a project management application for teams, with authentication, team workspaces, projects, and a Kanban board for task tracking.
 
-## Overview
+**Live demo:** https://taskflow-bay-five.vercel.app  ·  **API docs:** https://ejacode-taskflow-api.hf.space/docs
 
-Taskflow lets teams create projects and manage tasks with clear status tracking (To do → In progress → Done). It's built as a portfolio project to demonstrate professional, production-style engineering.
+> The demo is hosted on free tiers, so the first request after an idle period may take a few seconds while the services wake up.
+
+![Taskflow board](docs/images/board.png)
+
+## Features
+
+* Authentication with registration, login, and JWT sessions
+* Team workspaces with owner, admin, and member roles
+* Projects scoped to a team
+* Tasks with status, priority, assignee, due date, and description
+* Kanban board with drag and drop ordering
+* List view with sorting and status filters
+* Toast notifications for success and error states
 
 ## Tech Stack
 
-| Layer | Technology |
-| --- | --- |
-| Backend | FastAPI (Python), SQLAlchemy 2.0, Alembic, Pydantic v2 |
-| Database | PostgreSQL (SQLite for local dev) |
-| Auth | JWT (OAuth2 password flow) |
-| Frontend | React + Vite + TypeScript |
-| Testing | pytest, httpx |
-| Tooling | ruff, black, mypy, pre-commit |
-| CI/CD | GitHub Actions |
+**Frontend:** React, TypeScript, Vite, Tailwind CSS v4, TanStack Query, React Router, dnd-kit
 
-## Project Structure
+**Backend:** FastAPI, SQLAlchemy 2.0, Alembic, Pydantic v2, PyJWT
 
-```
-taskflow/
-├── backend/     # FastAPI application
-├── frontend/    # React SPA (Vite + TypeScript)
-└── .github/     # CI workflows
-```
+**Database:** PostgreSQL in production, SQLite for local development
+
+**Tooling:** pnpm, Ruff, Black, mypy, pytest, ESLint, Prettier, Vitest, GitHub Actions
+
+## Architecture
+
+~~~mermaid
+flowchart LR
+    Browser --> Web["Vercel (React SPA)"]
+    Web --> API["Hugging Face (FastAPI)"]
+    API --> DB["Neon (PostgreSQL)"]
+~~~
 
 ## Getting Started
 
-> ⚠️ Setup instructions will be filled in as the backend and frontend are scaffolded.
+### Prerequisites
 
-```bash
-git clone <your-repo-url>
-cd taskflow
-cp .env.example .env
-```
+* Python 3.11 or newer
+* Node.js 20 or newer
+* pnpm 10 or newer
+
+### Backend
+
+~~~bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate
+# Windows: .\.venv\Scripts\Activate.ps1
+pip install -e ".[dev]"
+alembic upgrade head
+uvicorn app.main:app --reload
+~~~
+
+The API runs at http://localhost:8000 with interactive docs at /docs. Local development uses SQLite, so no environment configuration is required.
+
+### Frontend
+
+~~~bash
+cd frontend
+pnpm install
+pnpm dev
+~~~
+
+The app runs at http://localhost:5173 and targets http://localhost:8000 by default. Set VITE_API_BASE_URL to point at a different API (see frontend/.env.example).
+
+## Testing
+
+~~~bash
+# Backend
+cd backend && pytest
+
+# Frontend
+cd frontend && pnpm test
+~~~
+
+## Project Structure
+
+~~~text
+taskflow/
+  backend/    FastAPI application, models, migrations, and tests
+  frontend/   React single page application
+  .github/    CI workflows
+~~~
+
+## Deployment
+
+The frontend is deployed to Vercel, the API to a Hugging Face Docker Space, and the database is hosted on Neon. The API reads its configuration from the DATABASE_URL, SECRET_KEY, and CORS_ORIGINS environment variables.
 
 ## License
 
-Released under the MIT License.
+Released under the MIT License. See [LICENSE](LICENSE).
