@@ -1,7 +1,8 @@
 import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 
-import { PRIORITY_CLASSES, type Task } from "./tasksApi"
+import { type Task } from "./tasksApi"
+import { PriorityBadge } from "./TaskBadges"
 
 export function TaskCard({
   task,
@@ -36,11 +37,7 @@ export function TaskCard({
       }`}
     >
       <p className="text-sm font-medium text-slate-900">{task.title}</p>
-      <span
-        className={`mt-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_CLASSES[task.priority]}`}
-      >
-        {task.priority}
-      </span>
+      <PriorityBadge priority={task.priority} />
     </div>
   )
 }

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from "react"
 
 import { type Member } from "../teams/membersApi"
 import {
+  PRIORITY_LABELS,
   type Task,
   type TaskPriority,
   type UpdateTaskPayload,
@@ -148,7 +149,7 @@ export function TaskDetailModal({
               >
                 {PRIORITIES.map((value) => (
                   <option key={value} value={value}>
-                    {value}
+                    {PRIORITY_LABELS[value]}
                   </option>
                 ))}
               </select>

@@ -1,12 +1,7 @@
 import { useState } from "react"
 
-import {
-  PRIORITY_CLASSES,
-  STATUS_LABELS,
-  type Task,
-  type TaskPriority,
-  type TaskStatus,
-} from "./tasksApi"
+import { type Task, type TaskPriority, type TaskStatus } from "./tasksApi"
+import { StatusBadge, PriorityBadge } from "./TaskBadges"
 
 type SortKey = "title" | "status" | "priority" | "assignee" | "due_date"
 type SortDir = "asc" | "desc"
@@ -135,14 +130,10 @@ export function ProjectTaskList({
                   {task.title}
                 </td>
                 <td className="px-3 py-2 text-slate-600">
-                  {STATUS_LABELS[task.status]}
+                  <StatusBadge status={task.status} />
                 </td>
                 <td className="px-3 py-2">
-                  <span
-                    className={`inline-block rounded-full px-2 py-0.5 text-xs font-medium ${PRIORITY_CLASSES[task.priority]}`}
-                  >
-                    {task.priority}
-                  </span>
+                  <PriorityBadge priority={task.priority} />
                 </td>
                 <td className="px-3 py-2 text-slate-600">
                   {getAssigneeName(task.assignee_id)}
