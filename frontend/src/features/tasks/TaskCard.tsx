@@ -27,6 +27,7 @@ export function TaskCard({
     attributes,
     listeners,
     setNodeRef,
+    setActivatorNodeRef,
     transform,
     transition,
     isDragging,
@@ -40,23 +41,56 @@ export function TaskCard({
   const due = formatDueDate(task.due_date)
   const overdue = due !== null && due.daysUntil < 0 && task.status !== "done"
   const dueClass = overdue
-    ? "text-red-600"
+    ? "text-red-700"
     : due !== null && due.daysUntil === 0
-      ? "text-amber-600"
-      : "text-slate-500"
+      ? "text-amber-700"
+      : "text-slate-600"
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       onClick={() => onOpen(task.id)}
-      {...attributes}
       {...listeners}
       className={`rounded-card shadow-card hover:shadow-card-hover cursor-grab border border-l-4 border-slate-200 bg-white p-3 transition-shadow ${
         PRIORITY_ACCENT[task.priority]
       } ${isDragging ? "opacity-50" : ""}`}
     >
-      <p className="text-sm font-medium text-slate-800">{task.title}</p>
+      <div className="flex items-start justify-between gap-2">
+        <button
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation()
+            onOpen(task.id)
+          }}
+          className="rounded text-left text-sm font-medium text-slate-800 hover:text-slate-900 hover:underline"
+        >
+          {task.title}
+        </button>
+
+        <button
+          type="button"
+          ref={setActivatorNodeRef}
+          {...attributes}
+          aria-label={`Drag ${task.title}`}
+          onClick={(event) => event.stopPropagation()}
+          className="shrink-0 cursor-grab rounded p-1 text-slate-400 hover:text-slate-600"
+        >
+          <svg
+            aria-hidden="true"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-4 w-4"
+          >
+            <circle cx="7" cy="5" r="1.5" />
+            <circle cx="13" cy="5" r="1.5" />
+            <circle cx="7" cy="10" r="1.5" />
+            <circle cx="13" cy="10" r="1.5" />
+            <circle cx="7" cy="15" r="1.5" />
+            <circle cx="13" cy="15" r="1.5" />
+          </svg>
+        </button>
+      </div>
 
       <div className="mt-3 flex items-center justify-between gap-2">
         <PriorityBadge priority={task.priority} />
