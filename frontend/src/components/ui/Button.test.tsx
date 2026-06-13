@@ -16,7 +16,7 @@ describe("Button", () => {
   it("uses the primary variant by default", () => {
     render(<Button>Go</Button>)
     expect(screen.getByRole("button", { name: "Go" })).toHaveClass(
-      "bg-slate-900",
+      "bg-brand-600",
     )
   })
 

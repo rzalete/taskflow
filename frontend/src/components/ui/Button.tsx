@@ -3,14 +3,14 @@ import { type ButtonHTMLAttributes, type ReactNode } from "react"
 type ButtonVariant = "primary" | "secondary" | "danger" | "ghost"
 type ButtonSize = "sm" | "md"
 
-// Variants intentionally mirror the styles already used across the app, so
-// adopting the primitive is a pure refactor with no visual change.
+// Variants are built on the shared design tokens (brand ramp + elevation).
 const VARIANT_CLASSES: Record<ButtonVariant, string> = {
-  primary: "bg-slate-900 text-white hover:bg-slate-800",
+  primary:
+    "bg-brand-600 text-white shadow-sm hover:bg-brand-700 active:bg-brand-800",
   secondary:
-    "border border-slate-300 bg-white text-slate-700 hover:bg-slate-50",
-  danger: "bg-red-600 text-white hover:bg-red-700",
-  ghost: "text-slate-600 hover:bg-slate-100",
+    "border border-slate-300 bg-white text-slate-700 shadow-sm hover:border-slate-400 hover:bg-slate-50",
+  danger: "bg-red-600 text-white shadow-sm hover:bg-red-700 active:bg-red-800",
+  ghost: "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
 }
 
 const SIZE_CLASSES: Record<ButtonSize, string> = {
