@@ -24,7 +24,7 @@ function ToastItem({
   return (
     <div
       role="status"
-      className={`flex items-start gap-3 rounded-lg border px-4 py-3 text-sm shadow-md ${toastClass[toast.type]}`}
+      className={`animate-toast-in flex items-start gap-3 rounded-lg border px-4 py-3 text-sm shadow-md ${toastClass[toast.type]}`}
     >
       <span className="flex-1">{toast.message}</span>
       <button
