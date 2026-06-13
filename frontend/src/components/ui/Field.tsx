@@ -14,10 +14,10 @@ export function Field({
   ...props
 }: FieldProps) {
   const inputClasses = [
-    "w-full rounded-md border px-3 py-2 text-sm focus:outline-none",
+    "shadow-sm w-full rounded-md border bg-white px-3 py-2 text-sm text-slate-900 transition-colors placeholder:text-slate-400 focus:outline-none",
     error
       ? "border-red-400 focus:border-red-500"
-      : "border-slate-300 focus:border-slate-500",
+      : "border-slate-300 focus:border-brand-500",
     className,
   ]
     .filter(Boolean)
