@@ -7,6 +7,7 @@ export function BoardColumn({
   title,
   count,
   taskIds,
+  index = 0,
   loading = false,
   children,
 }: {
@@ -14,6 +15,7 @@ export function BoardColumn({
   title: string
   count: number
   taskIds: number[]
+  index?: number
   loading?: boolean
   children: ReactNode
 }) {
@@ -24,7 +26,8 @@ export function BoardColumn({
       ref={setNodeRef}
       role="group"
       aria-label={`${title}, ${count} ${count === 1 ? "task" : "tasks"}`}
-      className={`flex w-64 shrink-0 flex-col rounded-xl bg-slate-100 p-3 ring-1 transition-colors ring-inset ${
+      style={{ animationDelay: `${index * 60}ms` }}
+      className={`animate-board-column-in flex w-64 shrink-0 flex-col rounded-xl bg-slate-100 p-3 ring-1 transition-colors ring-inset ${
         isOver ? "bg-brand-50 ring-brand-500 ring-2" : "ring-slate-200/60"
       }`}
     >

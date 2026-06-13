@@ -270,13 +270,14 @@ export function ProjectBoardPage() {
           }}
         >
           <div className="mt-6 flex gap-4 overflow-x-auto pb-4">
-            {COLUMNS.map((column) => {
+            {COLUMNS.map((column, index) => {
               const columnTasks = visibleTasks
                 .filter((task) => task.status === column.status)
                 .sort((a, b) => a.position - b.position)
               return (
                 <BoardColumn
                   key={column.status}
+                  index={index}
                   id={column.status}
                   title={column.title}
                   count={columnTasks.length}
