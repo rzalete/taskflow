@@ -79,7 +79,7 @@ export function ProjectTaskList({
     <div className="mt-6 overflow-x-auto">
       <table className="w-full border-collapse text-left text-sm">
         <thead>
-          <tr className="border-b border-slate-200 text-xs tracking-wide text-slate-500 uppercase">
+          <tr className="border-b border-slate-200 text-xs tracking-wide text-slate-600 uppercase">
             {HEADERS.map((header) => (
               <th
                 key={header.key}
@@ -114,7 +114,7 @@ export function ProjectTaskList({
             <tr>
               <td
                 colSpan={HEADERS.length}
-                className="px-3 py-6 text-center text-slate-500"
+                className="px-3 py-6 text-center text-slate-600"
               >
                 No tasks match the current filters.
               </td>
@@ -126,8 +126,17 @@ export function ProjectTaskList({
                 onClick={() => onOpen(task.id)}
                 className="cursor-pointer border-b border-slate-100 hover:bg-slate-50"
               >
-                <td className="px-3 py-2 font-medium text-slate-900">
-                  {task.title}
+                <td className="px-3 py-2">
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onOpen(task.id)
+                    }}
+                    className="text-left font-medium text-slate-900 hover:underline"
+                  >
+                    {task.title}
+                  </button>
                 </td>
                 <td className="px-3 py-2 text-slate-600">
                   <StatusBadge status={task.status} />
