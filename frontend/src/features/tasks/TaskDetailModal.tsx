@@ -85,7 +85,7 @@ export function TaskDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
+      className="animate-overlay-show fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
       role="presentation"
       onClick={onClose}
     >
@@ -95,7 +95,7 @@ export function TaskDetailModal({
         aria-modal="true"
         aria-labelledby="task-details-title"
         tabIndex={-1}
-        className="rounded-card shadow-popover flex w-full max-w-lg flex-col overflow-hidden bg-white ring-1 ring-black/5"
+        className="rounded-card shadow-popover animate-dialog-show flex w-full max-w-lg flex-col overflow-hidden bg-white ring-1 ring-black/5"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
