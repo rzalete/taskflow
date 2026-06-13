@@ -14,6 +14,9 @@ import { Button } from "../../components/ui/Button"
 
 const PRIORITIES: TaskPriority[] = ["low", "medium", "high", "urgent"]
 
+const inputClass =
+  "mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm transition-colors focus:border-brand-500 focus:outline-none"
+
 export function TaskDetailModal({
   task,
   teamId,
@@ -82,7 +85,7 @@ export function TaskDetailModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
       role="presentation"
       onClick={onClose}
     >
@@ -92,13 +95,13 @@ export function TaskDetailModal({
         aria-modal="true"
         aria-labelledby="task-details-title"
         tabIndex={-1}
-        className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl"
+        className="rounded-card shadow-popover flex w-full max-w-lg flex-col overflow-hidden bg-white ring-1 ring-black/5"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
           <h2
             id="task-details-title"
-            className="text-lg font-semibold text-slate-900"
+            className="text-base font-semibold tracking-tight text-slate-900"
           >
             Task details
           </h2>
@@ -106,109 +109,111 @@ export function TaskDetailModal({
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
           >
             ✕
           </button>
         </div>
 
-        <form onSubmit={handleSave} className="mt-4 space-y-4">
-          <div>
-            <label
-              htmlFor="task-title"
-              className="block text-sm font-medium text-slate-700"
-            >
-              Title
-            </label>
-            <input
-              id="task-title"
-              type="text"
-              required
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="task-description"
-              className="block text-sm font-medium text-slate-700"
-            >
-              Description
-            </label>
-            <textarea
-              id="task-description"
-              rows={3}
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
+        <form onSubmit={handleSave} className="flex flex-col">
+          <div className="max-h-[70vh] space-y-4 overflow-y-auto px-6 py-5">
             <div>
               <label
-                htmlFor="task-priority"
+                htmlFor="task-title"
                 className="block text-sm font-medium text-slate-700"
               >
-                Priority
+                Title
+              </label>
+              <input
+                id="task-title"
+                type="text"
+                required
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                className={inputClass}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="task-description"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Description
+              </label>
+              <textarea
+                id="task-description"
+                rows={3}
+                value={description}
+                onChange={(event) => setDescription(event.target.value)}
+                className={inputClass}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="task-priority"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Priority
+                </label>
+                <select
+                  id="task-priority"
+                  value={priority}
+                  onChange={(event) =>
+                    setPriority(event.target.value as TaskPriority)
+                  }
+                  className={inputClass}
+                >
+                  {PRIORITIES.map((value) => (
+                    <option key={value} value={value}>
+                      {PRIORITY_LABELS[value]}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label
+                  htmlFor="task-due"
+                  className="block text-sm font-medium text-slate-700"
+                >
+                  Due date
+                </label>
+                <input
+                  id="task-due"
+                  type="date"
+                  value={dueDate}
+                  onChange={(event) => setDueDate(event.target.value)}
+                  className={inputClass}
+                />
+              </div>
+            </div>
+
+            <div>
+              <label
+                htmlFor="task-assignee"
+                className="block text-sm font-medium text-slate-700"
+              >
+                Assignee
               </label>
               <select
-                id="task-priority"
-                value={priority}
-                onChange={(event) =>
-                  setPriority(event.target.value as TaskPriority)
-                }
-                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+                id="task-assignee"
+                value={assigneeId}
+                onChange={(event) => setAssigneeId(event.target.value)}
+                className={inputClass}
               >
-                {PRIORITIES.map((value) => (
-                  <option key={value} value={value}>
-                    {PRIORITY_LABELS[value]}
+                <option value="">Unassigned</option>
+                {members.map((member) => (
+                  <option key={member.user_id} value={member.user_id}>
+                    {member.full_name}
                   </option>
                 ))}
               </select>
             </div>
-            <div>
-              <label
-                htmlFor="task-due"
-                className="block text-sm font-medium text-slate-700"
-              >
-                Due date
-              </label>
-              <input
-                id="task-due"
-                type="date"
-                value={dueDate}
-                onChange={(event) => setDueDate(event.target.value)}
-                className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
-              />
-            </div>
           </div>
 
-          <div>
-            <label
-              htmlFor="task-assignee"
-              className="block text-sm font-medium text-slate-700"
-            >
-              Assignee
-            </label>
-            <select
-              id="task-assignee"
-              value={assigneeId}
-              onChange={(event) => setAssigneeId(event.target.value)}
-              className="mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
-            >
-              <option value="">Unassigned</option>
-              {members.map((member) => (
-                <option key={member.user_id} value={member.user_id}>
-                  {member.full_name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div className="flex items-center justify-between pt-2">
+          <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-6 py-4">
             {confirmingDelete ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-slate-600">
