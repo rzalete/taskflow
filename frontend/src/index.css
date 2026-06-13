@@ -3,9 +3,10 @@
 /*
  * Taskflow design language.
  * Tailwind v4 reads @theme and generates matching utilities, e.g.
- *   --color-brand-600  -> bg-brand-600 / text-brand-600 / ring-brand-600
- *   --shadow-card      -> shadow-card
- *   --radius-card      -> rounded-card
+ * --color-brand-600 -> bg-brand-600 / text-brand-600 / ring-brand-600
+ * --shadow-card -> shadow-card
+ * --radius-card -> rounded-card
+ * --animate-dialog-show -> animate-dialog-show
  */
 @theme {
   /* Typography */
@@ -36,6 +37,32 @@
     0 6px 16px -4px rgb(15 23 42 / 0.14), 0 2px 6px -2px rgb(15 23 42 / 0.1);
   --shadow-popover:
     0 12px 32px -8px rgb(15 23 42 / 0.22), 0 4px 12px -4px rgb(15 23 42 / 0.14);
+
+  /* Motion — entrance animations.
+   * Globally neutralized by the prefers-reduced-motion guard below,
+   * so opt-out users get an instant, motionless render. */
+  --animate-overlay-show: overlay-show 150ms ease-out;
+  --animate-dialog-show: dialog-show 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes overlay-show {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes dialog-show {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
 }
 
 @layer base {
