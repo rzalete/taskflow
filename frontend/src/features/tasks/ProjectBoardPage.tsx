@@ -3,11 +3,13 @@ import { useParams } from "react-router"
 import {
   closestCorners,
   DndContext,
+  KeyboardSensor,
   PointerSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
 } from "@dnd-kit/core"
+import { sortableKeyboardCoordinates } from "@dnd-kit/sortable"
 
 import { useProject } from "../projects/useProjects"
 import { BoardColumn } from "./BoardColumn"
@@ -39,6 +41,9 @@ export function ProjectBoardPage() {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
   )
 
   const membersQuery = useMembers(team)
@@ -63,6 +68,18 @@ export function ProjectBoardPage() {
     if (assigneeId === null) return "Unassigned"
     const member = membersQuery.data?.find((m) => m.user_id === assigneeId)
     return member?.full_name ?? `User ${assigneeId}`
+  }
+
+  // Labels for the drag-and-drop screen-reader announcements. A dnd-kit id is a
+  // UniqueIdentifier (string | number): a task id, or a column status string
+  // when a card is dropped on empty column space.
+  const taskTitleById = (id: string | number) =>
+    (tasksQuery.data ?? []).find((task) => task.id === Number(id))?.title ??
+    "the task"
+
+  const dropTargetLabel = (id: string | number) => {
+    const column = COLUMNS.find((col) => col.status === id)
+    return column ? `the ${column.title} column` : taskTitleById(id)
   }
 
   function handleOpen(taskId: number) {
@@ -228,6 +245,26 @@ export function ProjectBoardPage() {
           sensors={sensors}
           collisionDetection={closestCorners}
           onDragEnd={handleDragEnd}
+          accessibility={{
+            announcements: {
+              onDragStart: ({ active }) =>
+                `Picked up ${taskTitleById(active.id)}.`,
+              onDragOver: ({ active, over }) =>
+                over
+                  ? `${taskTitleById(active.id)} is over ${dropTargetLabel(over.id)}.`
+                  : `${taskTitleById(active.id)} is no longer over a drop target.`,
+              onDragEnd: ({ active, over }) =>
+                over
+                  ? `${taskTitleById(active.id)} was dropped onto ${dropTargetLabel(over.id)}.`
+                  : `${taskTitleById(active.id)} was dropped.`,
+              onDragCancel: ({ active }) =>
+                `Dragging ${taskTitleById(active.id)} was cancelled.`,
+            },
+            screenReaderInstructions: {
+              draggable:
+                "To pick up a task, focus its drag handle and press Space or Enter. Use the arrow keys to move it between positions and columns. Press Space or Enter to drop, or Escape to cancel.",
+            },
+          }}
         >
           <div className="mt-6 flex gap-4 overflow-x-auto pb-4">
             {COLUMNS.map((column) => {

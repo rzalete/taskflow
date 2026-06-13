@@ -22,6 +22,8 @@ export function BoardColumn({
   return (
     <div
       ref={setNodeRef}
+      role="group"
+      aria-label={`${title}, ${count} ${count === 1 ? "task" : "tasks"}`}
       className={`flex w-64 shrink-0 flex-col rounded-xl bg-slate-100 p-3 transition-colors ${
         isOver ? "bg-brand-50 ring-brand-500 ring-2" : ""
       }`}
@@ -40,7 +42,7 @@ export function BoardColumn({
               className={`rounded-card border border-dashed py-6 text-center text-xs transition-colors ${
                 isOver
                   ? "border-brand-500 text-brand-700"
-                  : "border-slate-300 text-slate-400"
+                  : "border-slate-300 text-slate-600"
               }`}
             >
               {isOver ? "Drop here" : "No tasks"}
