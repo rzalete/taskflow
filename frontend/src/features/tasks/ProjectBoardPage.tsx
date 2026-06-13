@@ -20,10 +20,25 @@ import { useCreateTask, useMoveTask, useTasks } from "./useTasks"
 import { useMembers } from "../teams/useMembers"
 import { TaskDetailModal } from "./TaskDetailModal"
 import { ProjectTaskList } from "./ProjectTaskList"
+import { Button } from "../../components/ui/Button"
 
 const COLUMNS: { status: TaskStatus; title: string }[] = (
   ["backlog", "todo", "in_progress", "in_review", "done"] as const
 ).map((status) => ({ status, title: STATUS_LABELS[status] }))
+
+// Filter dropdowns share the design-language field styling (shadow + brand focus).
+const selectClass =
+  "rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm shadow-sm focus:border-brand-500 focus:outline-none"
+
+// Segmented-control button styling for the Board / List toggle.
+function segmentClass(active: boolean) {
+  return [
+    "rounded-md px-3 py-1 text-sm font-medium transition-colors",
+    active
+      ? "bg-white text-brand-700 shadow-sm"
+      : "text-slate-600 hover:text-slate-900",
+  ].join(" ")
+}
 
 export function ProjectBoardPage() {
   const { teamId, projectId } = useParams()
@@ -159,28 +174,20 @@ export function ProjectBoardPage() {
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           placeholder="New task title"
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+          className="focus:border-brand-500 flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none"
         />
-        <button
-          type="submit"
-          disabled={createTask.isPending}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
-        >
+        <Button type="submit" disabled={createTask.isPending}>
           Add task
-        </button>
+        </Button>
       </form>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <div className="flex items-center gap-1 rounded-md border border-slate-300 p-0.5">
+        <div className="inline-flex items-center gap-1 rounded-lg bg-slate-100 p-1">
           <button
             type="button"
             onClick={() => setView("board")}
             aria-pressed={view === "board"}
-            className={`rounded px-3 py-1 text-sm font-medium ${
-              view === "board"
-                ? "bg-slate-900 text-white"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
+            className={segmentClass(view === "board")}
           >
             Board
           </button>
@@ -188,11 +195,7 @@ export function ProjectBoardPage() {
             type="button"
             onClick={() => setView("list")}
             aria-pressed={view === "list"}
-            className={`rounded px-3 py-1 text-sm font-medium ${
-              view === "list"
-                ? "bg-slate-900 text-white"
-                : "text-slate-600 hover:bg-slate-100"
-            }`}
+            className={segmentClass(view === "list")}
           >
             List
           </button>
@@ -204,7 +207,7 @@ export function ProjectBoardPage() {
             aria-label="Filter by assignee"
             value={assigneeFilter}
             onChange={(event) => setAssigneeFilter(event.target.value)}
-            className="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+            className={selectClass}
           >
             <option value="all">All assignees</option>
             <option value="unassigned">Unassigned</option>
@@ -223,7 +226,7 @@ export function ProjectBoardPage() {
               aria-label="Filter by status"
               value={statusFilter}
               onChange={(event) => setStatusFilter(event.target.value)}
-              className="rounded-md border border-slate-300 px-2 py-1.5 text-sm focus:border-slate-500 focus:outline-none"
+              className={selectClass}
             >
               <option value="all">All statuses</option>
               {COLUMNS.map((column) => (
