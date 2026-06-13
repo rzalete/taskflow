@@ -63,7 +63,7 @@ export function TaskCard({
             event.stopPropagation()
             onOpen(task.id)
           }}
-          className="rounded text-left text-sm font-medium text-slate-800 hover:text-slate-900 hover:underline"
+          className="hover:text-brand-700 rounded text-left text-sm font-medium text-slate-800 hover:underline"
         >
           {task.title}
         </button>
@@ -74,7 +74,7 @@ export function TaskCard({
           {...attributes}
           aria-label={`Drag ${task.title}`}
           onClick={(event) => event.stopPropagation()}
-          className="shrink-0 cursor-grab rounded p-1 text-slate-400 hover:text-slate-600"
+          className="hover:text-brand-600 shrink-0 cursor-grab rounded p-1 text-slate-400"
         >
           <svg
             aria-hidden="true"
