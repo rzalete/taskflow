@@ -8,7 +8,7 @@ import {
 } from "./tasksApi"
 
 const badgeBase =
-  "inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-xs font-medium ring-1 ring-inset ring-black/5"
+  "inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-xs font-medium ring-1 ring-inset ring-black/5 dark:ring-white/10"
 
 export function StatusBadge({ status }: { status: TaskStatus }) {
   return (

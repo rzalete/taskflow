@@ -4,6 +4,7 @@ import { Link, NavLink, Outlet } from "react-router"
 import { RouteFallback } from "./RouteFallback"
 import { useAuth } from "../features/auth/auth-context"
 import { HealthStatus } from "../features/health/HealthStatus"
+import { ThemeToggle } from "../features/theme/ThemeToggle"
 import { useTeams } from "../features/teams/useTeams"
 
 // Build up to two initials from a full name for the avatar chip.
@@ -16,13 +17,15 @@ function initials(name: string | undefined) {
 }
 
 // Deterministic soft tint for each team glyph, hashed off the team name.
+// Translucent fills + a lighter foreground in dark keep these legible on both
+// themes without a separate dark palette.
 const TEAM_TINTS = [
-  "bg-indigo-100 text-indigo-700",
-  "bg-sky-100 text-sky-700",
-  "bg-emerald-100 text-emerald-700",
-  "bg-amber-100 text-amber-700",
-  "bg-rose-100 text-rose-700",
-  "bg-violet-100 text-violet-700",
+  "bg-indigo-500/15 text-indigo-700 dark:text-indigo-300",
+  "bg-sky-500/15 text-sky-700 dark:text-sky-300",
+  "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+  "bg-rose-500/15 text-rose-700 dark:text-rose-300",
+  "bg-violet-500/15 text-violet-700 dark:text-violet-300",
 ]
 
 function tintFor(value: string) {
@@ -37,7 +40,7 @@ function navLinkClass({ isActive }: { isActive: boolean }) {
   return [
     "group relative flex items-center gap-2.5 rounded-control px-2.5 py-2 text-sm font-medium transition-colors",
     isActive
-      ? "bg-brand-50 text-brand-700"
+      ? "bg-brand-soft text-brand-accent"
       : "text-ink-muted hover:bg-well hover:text-ink",
   ].join(" ")
 }
@@ -70,7 +73,7 @@ export function AppLayout() {
             <p className="text-ink-faint px-2.5 py-2 text-sm">Loading…</p>
           )}
           {teamsQuery.isError && (
-            <p className="px-2.5 py-2 text-sm text-red-600">
+            <p className="text-danger-strong px-2.5 py-2 text-sm">
               Couldn't load teams.
             </p>
           )}
@@ -111,7 +114,7 @@ export function AppLayout() {
 
           <Link
             to="/teams/new"
-            className="text-brand-600 hover:bg-brand-50 rounded-control mt-2 flex items-center gap-2 px-2.5 py-2 text-sm font-medium transition-colors"
+            className="text-brand-accent hover:bg-brand-soft rounded-control mt-2 flex items-center gap-2 px-2.5 py-2 text-sm font-medium transition-colors"
           >
             <svg
               aria-hidden="true"
@@ -132,7 +135,7 @@ export function AppLayout() {
 
         <div className="border-line border-t p-3">
           <div className="flex items-center gap-2.5 px-2 py-1.5">
-            <span className="bg-brand-100 text-brand-700 ring-brand-200 rounded-pill flex h-8 w-8 shrink-0 items-center justify-center text-xs font-semibold ring-1">
+            <span className="bg-brand-soft text-brand-accent rounded-pill flex h-8 w-8 shrink-0 items-center justify-center text-xs font-semibold">
               {initials(user?.full_name)}
             </span>
             <div className="min-w-0 flex-1">
@@ -167,7 +170,8 @@ export function AppLayout() {
       </aside>
 
       <div className="flex flex-1 flex-col">
-        <header className="bg-surface/70 border-line sticky top-0 z-10 flex items-center justify-end border-b px-6 py-3 backdrop-blur-md">
+        <header className="bg-surface/70 border-line sticky top-0 z-10 flex items-center justify-end gap-3 border-b px-6 py-3 backdrop-blur-md">
+          <ThemeToggle />
           <HealthStatus />
         </header>
 

@@ -17,10 +17,10 @@ export function HealthStatus() {
 
   if (isError) {
     return (
-      <span className="rounded-pill inline-flex items-center gap-1.5 bg-red-100 px-3 py-1 text-sm text-red-700">
+      <span className="rounded-pill bg-danger-soft text-danger-strong inline-flex items-center gap-1.5 px-3 py-1 text-sm">
         <span
           aria-hidden="true"
-          className="rounded-pill h-1.5 w-1.5 bg-red-500"
+          className="rounded-pill bg-danger-strong h-1.5 w-1.5"
         />
         API unreachable
       </span>
@@ -28,10 +28,10 @@ export function HealthStatus() {
   }
 
   return (
-    <span className="rounded-pill inline-flex items-center gap-1.5 bg-green-100 px-3 py-1 text-sm text-green-700">
+    <span className="rounded-pill bg-success-soft text-success-strong inline-flex items-center gap-1.5 px-3 py-1 text-sm">
       <span
         aria-hidden="true"
-        className="rounded-pill h-1.5 w-1.5 bg-green-500"
+        className="rounded-pill bg-success-strong h-1.5 w-1.5"
       />
       API: {data.status}
     </span>

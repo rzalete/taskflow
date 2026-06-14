@@ -63,7 +63,7 @@ export function TaskCard({
             event.stopPropagation()
             onOpen(task.id)
           }}
-          className="hover:text-brand-700 text-ink rounded text-left text-sm font-medium hover:underline"
+          className="hover:text-brand-accent text-ink rounded text-left text-sm font-medium hover:underline"
         >
           {task.title}
         </button>

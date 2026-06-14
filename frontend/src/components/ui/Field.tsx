@@ -35,7 +35,7 @@ export function Field({
         {...props}
       />
       {error && (
-        <p id={`${id}-error`} className="text-[13px] text-red-600">
+        <p id={`${id}-error`} className="text-danger-strong text-[13px]">
           {error}
         </p>
       )}

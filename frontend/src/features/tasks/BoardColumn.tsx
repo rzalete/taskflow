@@ -28,7 +28,7 @@ export function BoardColumn({
       aria-label={`${title}, ${count} ${count === 1 ? "task" : "tasks"}`}
       style={{ animationDelay: `${index * 60}ms` }}
       className={`animate-board-column-in rounded-card bg-well flex min-w-0 flex-1 flex-col p-3 ring-1 transition-colors ring-inset ${
-        isOver ? "bg-brand-50 ring-brand-500 ring-2" : "ring-line/70"
+        isOver ? "bg-brand-soft ring-brand-500 ring-2" : "ring-line/70"
       }`}
     >
       <h3 className="text-ink-muted mb-3 flex items-center justify-between text-xs font-semibold tracking-wide uppercase">
@@ -44,7 +44,7 @@ export function BoardColumn({
             <p
               className={`rounded-card border border-dashed py-6 text-center text-xs font-medium transition-colors ${
                 isOver
-                  ? "border-brand-500 bg-brand-50/50 text-brand-700"
+                  ? "border-brand-500 bg-brand-soft text-brand-accent"
                   : "border-line-strong text-ink-muted"
               }`}
             >
