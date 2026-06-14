@@ -6,6 +6,7 @@ import { useTeam } from "./useTeams"
 import { useCreateProject, useProjects } from "../projects/useProjects"
 import { MembersSection } from "./MembersSection"
 import { useToast } from "../../components/toast/toast-context"
+import { Button } from "../../components/ui/Button"
 
 export function TeamPage() {
   const { teamId } = useParams()
@@ -36,23 +37,23 @@ export function TeamPage() {
 
   return (
     <div className="mx-auto max-w-3xl">
-      <h1 className="text-2xl font-bold text-slate-900">
+      <h1 className="text-h1 text-ink font-bold">
         {teamQuery.data?.name ?? "Team"}
       </h1>
 
       <section className="mt-6">
-        <h2 className="text-sm font-semibold tracking-wide text-slate-400 uppercase">
+        <h2 className="text-ink-faint text-sm font-semibold tracking-wide uppercase">
           Projects
         </h2>
 
         {projectsQuery.isPending && (
-          <p className="mt-2 text-sm text-slate-400">Loading…</p>
+          <p className="text-ink-faint mt-2 text-sm">Loading…</p>
         )}
         {projectsQuery.isError && (
           <p className="mt-2 text-sm text-red-600">Couldn't load projects.</p>
         )}
         {projectsQuery.data?.length === 0 && (
-          <p className="mt-2 text-sm text-slate-500">
+          <p className="text-ink-muted mt-2 text-sm">
             No projects yet. Create the first one below.
           </p>
         )}
@@ -62,11 +63,11 @@ export function TeamPage() {
             <li key={project.id}>
               <Link
                 to={`/teams/${id}/projects/${project.id}`}
-                className="block rounded-lg border border-slate-200 bg-white p-4 hover:border-slate-300 hover:shadow-sm"
+                className="rounded-card border-line bg-surface hover:border-line-strong hover:shadow-card block border p-4"
               >
-                <p className="font-medium text-slate-900">{project.name}</p>
+                <p className="text-ink font-medium">{project.name}</p>
                 {project.description && (
-                  <p className="mt-1 text-sm text-slate-500">
+                  <p className="text-ink-muted mt-1 text-sm">
                     {project.description}
                   </p>
                 )}
@@ -83,15 +84,11 @@ export function TeamPage() {
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="New project name"
-          className="flex-1 rounded-md border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+          className="rounded-control border-line-strong bg-surface placeholder:text-ink-faint focus:border-brand-500 flex-1 border px-3 py-2 text-sm shadow-sm focus:outline-none"
         />
-        <button
-          type="submit"
-          disabled={createProject.isPending}
-          className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:opacity-60"
-        >
+        <Button type="submit" disabled={createProject.isPending}>
           Add
-        </button>
+        </Button>
       </form>
 
       <MembersSection teamId={id} />

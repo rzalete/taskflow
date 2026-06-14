@@ -79,7 +79,7 @@ export function ProjectTaskList({
     <div className="mt-6 overflow-x-auto">
       <table className="w-full border-collapse text-left text-sm">
         <thead>
-          <tr className="border-b border-slate-200 text-xs tracking-wide text-slate-600 uppercase">
+          <tr className="border-line text-ink-muted border-b text-xs tracking-wide uppercase">
             {HEADERS.map((header) => (
               <th
                 key={header.key}
@@ -96,7 +96,7 @@ export function ProjectTaskList({
                 <button
                   type="button"
                   onClick={() => toggleSort(header.key)}
-                  className="flex items-center gap-1 hover:text-slate-800"
+                  className="hover:text-ink flex items-center gap-1"
                 >
                   {header.label}
                   {sortKey === header.key && (
@@ -114,7 +114,7 @@ export function ProjectTaskList({
             <tr>
               <td
                 colSpan={HEADERS.length}
-                className="px-3 py-6 text-center text-slate-600"
+                className="text-ink-muted px-3 py-6 text-center"
               >
                 No tasks match the current filters.
               </td>
@@ -124,7 +124,7 @@ export function ProjectTaskList({
               <tr
                 key={task.id}
                 onClick={() => onOpen(task.id)}
-                className="cursor-pointer border-b border-slate-100 hover:bg-slate-50"
+                className="border-line hover:bg-canvas cursor-pointer border-b"
               >
                 <td className="px-3 py-2">
                   <button
@@ -133,21 +133,21 @@ export function ProjectTaskList({
                       event.stopPropagation()
                       onOpen(task.id)
                     }}
-                    className="text-left font-medium text-slate-900 hover:underline"
+                    className="text-ink text-left font-medium hover:underline"
                   >
                     {task.title}
                   </button>
                 </td>
-                <td className="px-3 py-2 text-slate-600">
+                <td className="text-ink-muted px-3 py-2">
                   <StatusBadge status={task.status} />
                 </td>
                 <td className="px-3 py-2">
                   <PriorityBadge priority={task.priority} />
                 </td>
-                <td className="px-3 py-2 text-slate-600">
+                <td className="text-ink-muted px-3 py-2">
                   {getAssigneeName(task.assignee_id)}
                 </td>
-                <td className="px-3 py-2 text-slate-600">
+                <td className="text-ink-muted px-3 py-2">
                   {task.due_date ?? "—"}
                 </td>
               </tr>

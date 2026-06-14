@@ -8,7 +8,7 @@ import {
 } from "./tasksApi"
 
 const badgeBase =
-  "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ring-1 ring-inset ring-black/5"
+  "inline-flex items-center gap-1 rounded-pill px-2 py-0.5 text-xs font-medium ring-1 ring-inset ring-black/5"
 
 export function StatusBadge({ status }: { status: TaskStatus }) {
   return (
@@ -23,7 +23,7 @@ export function PriorityBadge({ priority }: { priority: TaskPriority }) {
     <span className={`${badgeBase} ${PRIORITY_CLASSES[priority]}`}>
       <span
         aria-hidden="true"
-        className="h-1.5 w-1.5 rounded-full bg-current opacity-70"
+        className="rounded-pill h-1.5 w-1.5 bg-current opacity-70"
       />
       {PRIORITY_LABELS[priority]}
     </span>

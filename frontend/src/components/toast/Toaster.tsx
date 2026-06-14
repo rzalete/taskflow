@@ -24,14 +24,14 @@ function ToastItem({
   return (
     <div
       role="status"
-      className={`animate-toast-in flex items-start gap-3 rounded-lg border px-4 py-3 text-sm shadow-md ${toastClass[toast.type]}`}
+      className={`animate-toast-in rounded-card shadow-card-hover flex items-start gap-3 border px-4 py-3 text-sm ${toastClass[toast.type]}`}
     >
       <span className="flex-1">{toast.message}</span>
       <button
         type="button"
         aria-label="Dismiss"
         onClick={() => onDismiss(toast.id)}
-        className="shrink-0 opacity-70 hover:opacity-100"
+        className="shrink-0 opacity-70 transition-opacity hover:opacity-100"
       >
         ✕
       </button>

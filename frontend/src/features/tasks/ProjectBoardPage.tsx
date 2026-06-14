@@ -28,15 +28,15 @@ const COLUMNS: { status: TaskStatus; title: string }[] = (
 
 // Filter dropdowns share the design-language field styling (shadow + brand focus).
 const selectClass =
-  "rounded-md border border-slate-300 bg-white px-2 py-1.5 text-sm shadow-sm focus:border-brand-500 focus:outline-none"
+  "rounded-control border border-line-strong bg-surface px-2 py-1.5 text-sm shadow-sm focus:border-brand-500 focus:outline-none"
 
 // Segmented-control button styling for the Board / List toggle.
 function segmentClass(active: boolean) {
   return [
-    "rounded-md px-3 py-1 text-sm font-medium transition-colors",
+    "rounded-control px-3 py-1 text-sm font-medium transition-colors",
     active
-      ? "bg-white text-brand-700 shadow-sm"
-      : "text-slate-600 hover:text-slate-900",
+      ? "bg-surface text-brand-700 shadow-sm"
+      : "text-ink-muted hover:text-ink",
   ].join(" ")
 }
 
@@ -160,7 +160,7 @@ export function ProjectBoardPage() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-slate-900">
+      <h1 className="text-h1 text-ink font-bold">
         {projectQuery.data?.name ?? "Project"}
       </h1>
 
@@ -174,7 +174,7 @@ export function ProjectBoardPage() {
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           placeholder="New task title"
-          className="focus:border-brand-500 flex-1 rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm placeholder:text-slate-400 focus:outline-none"
+          className="focus:border-brand-500 rounded-control border-line-strong bg-surface placeholder:text-ink-faint flex-1 border px-3 py-2 text-sm shadow-sm focus:outline-none"
         />
         <Button type="submit" disabled={createTask.isPending}>
           Add task
@@ -182,7 +182,7 @@ export function ProjectBoardPage() {
       </form>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
-        <div className="inline-flex items-center gap-1 rounded-lg bg-slate-100 p-1">
+        <div className="rounded-control bg-well inline-flex items-center gap-1 p-1">
           <button
             type="button"
             onClick={() => setView("board")}
@@ -202,7 +202,7 @@ export function ProjectBoardPage() {
         </div>
 
         <div className="flex items-center gap-2">
-          <span className="text-sm text-slate-600">Assignee:</span>
+          <span className="text-ink-muted text-sm">Assignee:</span>
           <select
             aria-label="Filter by assignee"
             value={assigneeFilter}
@@ -221,7 +221,7 @@ export function ProjectBoardPage() {
 
         {view === "list" && (
           <div className="flex items-center gap-2">
-            <span className="text-sm text-slate-600">Status:</span>
+            <span className="text-ink-muted text-sm">Status:</span>
             <select
               aria-label="Filter by status"
               value={statusFilter}
@@ -269,7 +269,7 @@ export function ProjectBoardPage() {
             },
           }}
         >
-          <div className="mt-6 flex gap-4 overflow-x-auto pb-4">
+          <div className="mt-6 flex gap-3 overflow-x-auto pb-4">
             {COLUMNS.map((column, index) => {
               const columnTasks = visibleTasks
                 .filter((task) => task.status === column.status)
