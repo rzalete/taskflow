@@ -39,22 +39,27 @@ export function LoginPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+    <main className="bg-canvas flex min-h-screen items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm space-y-5 rounded-xl border border-slate-200 bg-white p-8 shadow-sm"
+        className="rounded-card border-line bg-surface shadow-card w-full max-w-sm space-y-5 border p-8"
       >
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-slate-900">Welcome back</h1>
-          <p className="text-sm text-slate-500">
-            Sign in to your Taskflow account.
-          </p>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <span className="bg-brand-gradient shadow-brand rounded-card flex h-11 w-11 items-center justify-center text-lg font-bold text-white">
+            T
+          </span>
+          <div className="space-y-1">
+            <h1 className="text-h1 text-ink font-bold">Welcome back</h1>
+            <p className="text-ink-muted text-sm">
+              Sign in to your Taskflow account.
+            </p>
+          </div>
         </div>
 
         {error && (
           <p
             role="alert"
-            className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700"
+            className="rounded-control bg-red-50 px-3 py-2 text-sm text-red-700"
           >
             {error}
           </p>
@@ -82,12 +87,9 @@ export function LoginPage() {
           {isSubmitting ? "Signing in…" : "Sign in"}
         </Button>
 
-        <p className="text-center text-sm text-slate-500">
+        <p className="text-ink-muted text-center text-sm">
           Don't have an account?{" "}
-          <Link
-            to="/register"
-            className="font-medium text-slate-900 hover:underline"
-          >
+          <Link to="/register" className="text-ink font-medium hover:underline">
             Create one
           </Link>
         </p>

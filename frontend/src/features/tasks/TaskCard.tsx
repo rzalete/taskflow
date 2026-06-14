@@ -44,7 +44,7 @@ export function TaskCard({
     ? "text-red-700"
     : due !== null && due.daysUntil === 0
       ? "text-amber-700"
-      : "text-slate-600"
+      : "text-ink-muted"
 
   return (
     <div
@@ -52,7 +52,7 @@ export function TaskCard({
       style={style}
       onClick={() => onOpen(task.id)}
       {...listeners}
-      className={`rounded-card shadow-card hover:shadow-card-hover cursor-grab border border-l-4 border-slate-200 bg-white p-3 transition-shadow ${
+      className={`rounded-card shadow-card hover:shadow-card-hover border-line bg-surface cursor-grab border border-l-4 p-3 transition-[box-shadow,transform] hover:-translate-y-0.5 ${
         PRIORITY_ACCENT[task.priority]
       } ${isDragging ? "opacity-50" : ""}`}
     >
@@ -63,7 +63,7 @@ export function TaskCard({
             event.stopPropagation()
             onOpen(task.id)
           }}
-          className="hover:text-brand-700 rounded text-left text-sm font-medium text-slate-800 hover:underline"
+          className="hover:text-brand-700 text-ink rounded text-left text-sm font-medium hover:underline"
         >
           {task.title}
         </button>
@@ -74,7 +74,7 @@ export function TaskCard({
           {...attributes}
           aria-label={`Drag ${task.title}`}
           onClick={(event) => event.stopPropagation()}
-          className="hover:text-brand-600 shrink-0 cursor-grab rounded p-1 text-slate-400"
+          className="hover:text-brand-600 text-ink-faint shrink-0 cursor-grab rounded p-1"
         >
           <svg
             aria-hidden="true"

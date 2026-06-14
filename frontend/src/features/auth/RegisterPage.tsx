@@ -35,24 +35,27 @@ export function RegisterPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
+    <main className="bg-canvas flex min-h-screen items-center justify-center px-4">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm space-y-5 rounded-xl border border-slate-200 bg-white p-8 shadow-sm"
+        className="rounded-card border-line bg-surface shadow-card w-full max-w-sm space-y-5 border p-8"
       >
-        <div className="space-y-1">
-          <h1 className="text-2xl font-bold text-slate-900">
-            Create your account
-          </h1>
-          <p className="text-sm text-slate-500">
-            Start organizing your work with Taskflow.
-          </p>
+        <div className="flex flex-col items-center gap-3 text-center">
+          <span className="bg-brand-gradient shadow-brand rounded-card flex h-11 w-11 items-center justify-center text-lg font-bold text-white">
+            T
+          </span>
+          <div className="space-y-1">
+            <h1 className="text-h1 text-ink font-bold">Create your account</h1>
+            <p className="text-ink-muted text-sm">
+              Start organizing your work with Taskflow.
+            </p>
+          </div>
         </div>
 
         {error && (
           <p
             role="alert"
-            className="rounded-md bg-red-50 px-3 py-2 text-sm text-red-700"
+            className="rounded-control bg-red-50 px-3 py-2 text-sm text-red-700"
           >
             {error}
           </p>
@@ -90,12 +93,9 @@ export function RegisterPage() {
           {isSubmitting ? "Creating account…" : "Create account"}
         </Button>
 
-        <p className="text-center text-sm text-slate-500">
+        <p className="text-ink-muted text-center text-sm">
           Already have an account?{" "}
-          <Link
-            to="/login"
-            className="font-medium text-slate-900 hover:underline"
-          >
+          <Link to="/login" className="text-ink font-medium hover:underline">
             Sign in
           </Link>
         </p>

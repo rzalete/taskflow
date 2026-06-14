@@ -1,8 +1,8 @@
-import { type InputHTMLAttributes, type ReactNode } from "react"
+import { type InputHTMLAttributes } from "react"
 
-type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
+interface FieldProps extends InputHTMLAttributes<HTMLInputElement> {
   id: string
-  label: ReactNode
+  label: string
   error?: string
 }
 
@@ -13,33 +13,32 @@ export function Field({
   className = "",
   ...props
 }: FieldProps) {
-  const inputClasses = [
-    "shadow-sm w-full rounded-md border bg-white px-3 py-2 text-sm text-slate-900 transition-colors placeholder:text-slate-400 focus:outline-none",
-    error
-      ? "border-red-400 focus:border-red-500"
-      : "border-slate-300 focus:border-brand-500",
-    className,
-  ]
-    .filter(Boolean)
-    .join(" ")
-
   return (
-    <div className="space-y-1">
-      <label htmlFor={id} className="block text-sm font-medium text-slate-700">
+    <div className="space-y-1.5">
+      <label
+        htmlFor={id}
+        className="text-ink-muted block text-[13px] font-medium"
+      >
         {label}
       </label>
       <input
-        {...props}
         id={id}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
-        className={inputClasses}
+        className={[
+          "rounded-control bg-surface text-ink placeholder:text-ink-faint w-full border px-3.5 py-2.5 text-sm shadow-sm transition-[color,border-color,box-shadow] focus:ring-4 focus:outline-none",
+          error
+            ? "border-red-400 focus:border-red-500 focus:ring-red-500/15"
+            : "border-line-strong focus:border-brand-500 focus:ring-brand-500/15",
+          className,
+        ].join(" ")}
+        {...props}
       />
-      {error ? (
-        <p id={`${id}-error`} className="text-sm text-red-600">
+      {error && (
+        <p id={`${id}-error`} className="text-[13px] text-red-600">
           {error}
         </p>
-      ) : null}
+      )}
     </div>
   )
 }

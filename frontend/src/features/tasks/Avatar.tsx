@@ -21,7 +21,7 @@ export function Avatar({ name }: { name: string }) {
   return (
     <span
       title={name}
-      className={`inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-semibold ${colorFor(
+      className={`rounded-pill inline-flex h-6 w-6 shrink-0 items-center justify-center text-[10px] font-semibold ${colorFor(
         name,
       )}`}
     >

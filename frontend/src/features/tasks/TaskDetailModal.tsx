@@ -1,4 +1,5 @@
 import { useRef, useState, type FormEvent } from "react"
+import { createPortal } from "react-dom"
 
 import { type Member } from "../teams/membersApi"
 import {
@@ -15,7 +16,7 @@ import { Button } from "../../components/ui/Button"
 const PRIORITIES: TaskPriority[] = ["low", "medium", "high", "urgent"]
 
 const inputClass =
-  "mt-1 w-full rounded-md border border-slate-300 px-3 py-2 text-sm shadow-sm transition-colors focus:border-brand-500 focus:outline-none"
+  "mt-1 w-full rounded-control border border-line-strong bg-surface px-3 py-2 text-sm text-ink shadow-sm transition-colors focus:border-brand-500 focus:outline-none"
 
 export function TaskDetailModal({
   task,
@@ -83,7 +84,11 @@ export function TaskDetailModal({
     }
   }
 
-  return (
+  // Rendered through a portal to document.body so the fixed overlay covers the
+  // whole viewport. Without this it would be trapped by AppLayout's
+  // `animate-fade-in-up` wrapper, whose lingering transform creates a
+  // containing block for fixed-position descendants.
+  return createPortal(
     <div
       className="animate-overlay-show fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
       role="presentation"
@@ -95,13 +100,13 @@ export function TaskDetailModal({
         aria-modal="true"
         aria-labelledby="task-details-title"
         tabIndex={-1}
-        className="rounded-card shadow-popover animate-dialog-show flex w-full max-w-lg flex-col overflow-hidden bg-white ring-1 ring-black/5"
+        className="rounded-card shadow-popover animate-dialog-show bg-surface flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col overflow-hidden ring-1 ring-black/5"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-6 py-4">
+        <div className="border-line flex shrink-0 items-center justify-between border-b px-6 py-4">
           <h2
             id="task-details-title"
-            className="text-base font-semibold tracking-tight text-slate-900"
+            className="text-ink text-base font-semibold tracking-tight"
           >
             Task details
           </h2>
@@ -109,18 +114,18 @@ export function TaskDetailModal({
             type="button"
             aria-label="Close"
             onClick={onClose}
-            className="rounded-md p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600"
+            className="rounded-control text-ink-faint hover:bg-well hover:text-ink-muted p-1.5 transition-colors"
           >
             ✕
           </button>
         </div>
 
-        <form onSubmit={handleSave} className="flex flex-col">
-          <div className="max-h-[70vh] space-y-4 overflow-y-auto px-6 py-5">
+        <form onSubmit={handleSave} className="flex min-h-0 flex-1 flex-col">
+          <div className="min-h-0 flex-1 space-y-4 overflow-y-auto px-6 py-5">
             <div>
               <label
                 htmlFor="task-title"
-                className="block text-sm font-medium text-slate-700"
+                className="text-ink-muted block text-sm font-medium"
               >
                 Title
               </label>
@@ -137,7 +142,7 @@ export function TaskDetailModal({
             <div>
               <label
                 htmlFor="task-description"
-                className="block text-sm font-medium text-slate-700"
+                className="text-ink-muted block text-sm font-medium"
               >
                 Description
               </label>
@@ -154,7 +159,7 @@ export function TaskDetailModal({
               <div>
                 <label
                   htmlFor="task-priority"
-                  className="block text-sm font-medium text-slate-700"
+                  className="text-ink-muted block text-sm font-medium"
                 >
                   Priority
                 </label>
@@ -176,7 +181,7 @@ export function TaskDetailModal({
               <div>
                 <label
                   htmlFor="task-due"
-                  className="block text-sm font-medium text-slate-700"
+                  className="text-ink-muted block text-sm font-medium"
                 >
                   Due date
                 </label>
@@ -193,7 +198,7 @@ export function TaskDetailModal({
             <div>
               <label
                 htmlFor="task-assignee"
-                className="block text-sm font-medium text-slate-700"
+                className="text-ink-muted block text-sm font-medium"
               >
                 Assignee
               </label>
@@ -213,10 +218,10 @@ export function TaskDetailModal({
             </div>
           </div>
 
-          <div className="flex items-center justify-between border-t border-slate-200 bg-slate-50 px-6 py-4">
+          <div className="border-line bg-canvas flex shrink-0 items-center justify-between border-t px-6 py-4">
             {confirmingDelete ? (
               <div className="flex items-center gap-2">
-                <span className="text-sm text-slate-600">
+                <span className="text-ink-muted text-sm">
                   Delete this task?
                 </span>
                 <Button
@@ -230,7 +235,7 @@ export function TaskDetailModal({
                 <button
                   type="button"
                   onClick={() => setConfirmingDelete(false)}
-                  className="text-sm text-slate-500 hover:underline"
+                  className="text-ink-muted text-sm hover:underline"
                 >
                   Cancel
                 </button>
@@ -255,6 +260,7 @@ export function TaskDetailModal({
           </div>
         </form>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
