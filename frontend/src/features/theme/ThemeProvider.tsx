@@ -3,6 +3,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react"
 
@@ -14,6 +15,7 @@ import {
 } from "./theme-context"
 
 const THEMES: Theme[] = ["light", "dark", "system"]
+const PREFERS_DARK_QUERY = "(prefers-color-scheme: dark)"
 
 function isTheme(value: unknown): value is Theme {
   return typeof value === "string" && (THEMES as string[]).includes(value)
@@ -29,17 +31,30 @@ function readStoredTheme(): Theme {
   return "system"
 }
 
-function systemPrefersDark(): boolean {
+// --- OS preference as an external store --------------------------------
+// matchMedia is an external system, so we read it via useSyncExternalStore
+// rather than mirroring it into state with a setState-in-effect (which the
+// react-hooks/set-state-in-effect rule rightly forbids). React only re-renders
+// through the subscription callback below — never synchronously inside an
+// effect body.
+function subscribeToSystemTheme(onChange: () => void): () => void {
+  if (
+    typeof window === "undefined" ||
+    typeof window.matchMedia !== "function"
+  ) {
+    return () => {}
+  }
+  const media = window.matchMedia(PREFERS_DARK_QUERY)
+  media.addEventListener("change", onChange)
+  return () => media.removeEventListener("change", onChange)
+}
+
+function getSystemPrefersDark(): boolean {
   return (
     typeof window !== "undefined" &&
     typeof window.matchMedia === "function" &&
-    window.matchMedia("(prefers-color-scheme: dark)").matches
+    window.matchMedia(PREFERS_DARK_QUERY).matches
   )
-}
-
-function resolveTheme(theme: Theme): ResolvedTheme {
-  if (theme === "system") return systemPrefersDark() ? "dark" : "light"
-  return theme
 }
 
 function applyResolvedTheme(resolved: ResolvedTheme) {
@@ -50,35 +65,25 @@ function applyResolvedTheme(resolved: ResolvedTheme) {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(readStoredTheme)
-  const [resolvedTheme, setResolvedTheme] = useState<ResolvedTheme>(() =>
-    resolveTheme(theme),
+
+  // Track the OS preference live. The server/no-match snapshot is light.
+  const systemPrefersDark = useSyncExternalStore(
+    subscribeToSystemTheme,
+    getSystemPrefersDark,
+    () => false,
   )
 
-  // Apply the chosen theme whenever it changes.
-  useEffect(() => {
-    const resolved = resolveTheme(theme)
-    applyResolvedTheme(resolved)
-    setResolvedTheme(resolved)
-  }, [theme])
+  // Derived during render — no effect or setState needed. "system" follows the
+  // OS; an explicit choice wins.
+  const resolvedTheme: ResolvedTheme =
+    theme === "system" ? (systemPrefersDark ? "dark" : "light") : theme
 
-  // While following the system, re-resolve as the OS preference changes live.
+  // The only effect: push the resolved theme onto <html>. This updates an
+  // external system (the DOM) and never calls setState, so it satisfies
+  // react-hooks/set-state-in-effect.
   useEffect(() => {
-    if (theme !== "system") return
-    if (
-      typeof window === "undefined" ||
-      typeof window.matchMedia !== "function"
-    ) {
-      return
-    }
-    const media = window.matchMedia("(prefers-color-scheme: dark)")
-    const onChange = () => {
-      const resolved: ResolvedTheme = media.matches ? "dark" : "light"
-      applyResolvedTheme(resolved)
-      setResolvedTheme(resolved)
-    }
-    media.addEventListener("change", onChange)
-    return () => media.removeEventListener("change", onChange)
-  }, [theme])
+    applyResolvedTheme(resolvedTheme)
+  }, [resolvedTheme])
 
   const setTheme = useCallback((next: Theme) => {
     setThemeState(next)
