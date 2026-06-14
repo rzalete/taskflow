@@ -50,7 +50,9 @@ export function TeamPage() {
           <p className="text-ink-faint mt-2 text-sm">Loading…</p>
         )}
         {projectsQuery.isError && (
-          <p className="mt-2 text-sm text-red-600">Couldn't load projects.</p>
+          <p className="text-danger-strong mt-2 text-sm">
+            Couldn't load projects.
+          </p>
         )}
         {projectsQuery.data?.length === 0 && (
           <p className="text-ink-muted mt-2 text-sm">

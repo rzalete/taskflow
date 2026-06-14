@@ -5,7 +5,7 @@ export function TaskCardSkeleton() {
     <div
       data-testid="task-skeleton"
       aria-hidden="true"
-      className="rounded-card shadow-card border border-l-4 border-slate-200 bg-white p-3"
+      className="rounded-card shadow-card border-line bg-surface border border-l-4 p-3"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="skeleton-shimmer h-4 w-3/4 rounded" />

@@ -5,8 +5,10 @@ import { type Toast } from "./toast-context"
 const TOAST_DURATION = 4000
 
 const toastClass: Record<Toast["type"], string> = {
-  success: "border-green-200 bg-green-50 text-green-800",
-  error: "border-red-200 bg-red-50 text-red-800",
+  success:
+    "bg-success-soft text-success-strong ring-1 ring-inset ring-black/5 dark:ring-white/10",
+  error:
+    "bg-danger-soft text-danger-strong ring-1 ring-inset ring-black/5 dark:ring-white/10",
 }
 
 function ToastItem({
@@ -24,7 +26,7 @@ function ToastItem({
   return (
     <div
       role="status"
-      className={`animate-toast-in rounded-card shadow-card-hover flex items-start gap-3 border px-4 py-3 text-sm ${toastClass[toast.type]}`}
+      className={`animate-toast-in rounded-card shadow-card-hover flex items-start gap-3 px-4 py-3 text-sm ${toastClass[toast.type]}`}
     >
       <span className="flex-1">{toast.message}</span>
       <button

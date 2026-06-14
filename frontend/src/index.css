@@ -1,20 +1,25 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 @import "tailwindcss";
 
+/* Enable Tailwind's `dark:` variant against a `.dark` class on the <html>
+ * element, so a user can override their OS preference (Light / System / Dark).
+ * A pure prefers-color-scheme media query could not support that override. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /*
  * Taskflow design language — "Refined Product-Craft".
  *
  * Tailwind v4 reads @theme and generates matching utilities, e.g.
- *   --color-brand-600 -> bg-brand-600 / text-brand-600 / ring-brand-600
- *   --color-surface   -> bg-surface / text-surface / border-surface
- *   --color-ink-muted -> text-ink-muted
- *   --text-h1         -> text-h1 (size + line-height + tracking)
- *   --radius-control  -> rounded-control
- *   --shadow-card     -> shadow-card
- *   --animate-*       -> animate-*
+ * --color-brand-600 -> bg-brand-600 / text-brand-600 / ring-brand-600
+ * --color-surface -> bg-surface / text-surface / border-surface
+ * --color-ink-muted -> text-ink-muted
+ * --text-h1 -> text-h1 (size + line-height + tracking)
+ * --radius-control -> rounded-control
+ * --shadow-card -> shadow-card
+ * --animate-* -> animate-*
  *
- * Semantic color roles live in one place so a future dark theme only needs to
- * remap these tokens — components never hardcode slate values.
+ * Semantic color roles live in one place so the dark theme only needs to remap
+ * these tokens under `:root.dark` — components never hardcode slate values.
  */
 @theme {
   /* ---- Typography --------------------------------------------------- */
@@ -60,6 +65,27 @@
   --color-ink: #0c1322;
   --color-ink-muted: #5a6577;
   --color-ink-faint: #9aa3b4;
+
+  /* ---- Accent roles — soft tinted fill + readable foreground -------- */
+  /* Used by status/priority badges, toasts and inline status pills. The dark
+   * theme remaps soft -> translucent tint and strong -> a light 300-step. */
+  --color-info-soft: #dbeafe;
+  --color-info-strong: #1d4ed8;
+  --color-success-soft: #dcfce7;
+  --color-success-strong: #15803d;
+  --color-warning-soft: #fef3c7;
+  --color-warning-strong: #b45309;
+  --color-danger-soft: #fee2e2;
+  --color-danger-strong: #b91c1c;
+
+  /* ---- Brand-state roles -------------------------------------------- */
+  /* brand-soft = selected/hover surface; brand-accent = brand-colored text or
+   * icons that need enough contrast on neutral surfaces in both themes. */
+  --color-brand-soft: #eef0ff;
+  --color-brand-accent: #4548c4;
+
+  /* Themable skeleton-shimmer highlight (swept across loading placeholders). */
+  --shimmer-highlight: #f5f6fa;
 
   /* ---- Radii -------------------------------------------------------- */
   --radius-control: 0.625rem;
@@ -153,12 +179,13 @@
 }
 
 /* Loading shimmer utility — a soft highlight that sweeps across skeleton
- * placeholders. The prefers-reduced-motion guard below freezes it. */
+ * placeholders. The highlight color is themable; the prefers-reduced-motion
+ * guard below freezes the sweep. */
 @utility skeleton-shimmer {
   background-image: linear-gradient(
     90deg,
     var(--color-well) 25%,
-    #f5f6fa 50%,
+    var(--shimmer-highlight) 50%,
     var(--color-well) 75%
   );
   background-size: 200% 100%;
@@ -180,6 +207,9 @@
     font-feature-settings: "cv11", "ss01";
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Default scheme; flipped to dark by :root.dark below. Drives native
+     * controls (scrollbars, date picker, form fields) per theme. */
+    color-scheme: light;
   }
 
   body {
@@ -240,6 +270,72 @@
   *::-webkit-scrollbar-thumb:hover {
     background-color: var(--color-ink-faint);
   }
+}
+
+/*
+ * ---- Dark theme -----------------------------------------------------
+ * Toggled by the `.dark` class on <html> (set by ThemeProvider and the
+ * anti-FOUC boot script in index.html). We only remap token VALUES here;
+ * :root.dark (0,2,0) outranks :root (0,1,0), so every component that reads a
+ * semantic token re-themes automatically.
+ */
+:root.dark {
+  color-scheme: dark;
+
+  /* Surfaces — deep cool charcoal with a subtle blue cast */
+  --color-surface: #161b26;
+  --color-surface-raised: #1d2330;
+  --color-canvas: #0e1117;
+  --color-well: #1e2430;
+  /* Hairlines / borders */
+  --color-line: #29303f;
+  --color-line-strong: #3a4254;
+  /* Ink (text) */
+  --color-ink: #e9ecf3;
+  --color-ink-muted: #a6afc0;
+  --color-ink-faint: #6e7789;
+
+  /* Brand stays vivid; soft state becomes a translucent tint, accent lightens
+   * to a ~brand-300 so brand-colored text stays legible on dark. */
+  --color-brand-soft: color-mix(
+    in srgb,
+    var(--color-brand-500) 22%,
+    transparent
+  );
+  --color-brand-accent: #aab0ff;
+
+  /* Accent roles — translucent fills + light, AA-legible foreground. */
+  --color-info-soft: color-mix(in srgb, #3b82f6 20%, transparent);
+  --color-info-strong: #93c5fd;
+  --color-success-soft: color-mix(in srgb, #22c55e 20%, transparent);
+  --color-success-strong: #86efac;
+  --color-warning-soft: color-mix(in srgb, #f59e0b 20%, transparent);
+  --color-warning-strong: #fcd34d;
+  --color-danger-soft: color-mix(in srgb, #ef4444 22%, transparent);
+  --color-danger-strong: #fca5a5;
+
+  /* Shimmer highlight tuned for dark surfaces */
+  --shimmer-highlight: #2a3140;
+
+  /* Deeper, near-black elevation reads better on dark surfaces */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.4);
+  --shadow-card: 0 1px 2px 0 rgb(0 0 0 / 0.4), 0 4px 10px -3px rgb(0 0 0 / 0.5);
+  --shadow-card-hover:
+    0 16px 36px -12px rgb(0 0 0 / 0.65), 0 6px 14px -8px rgb(0 0 0 / 0.5);
+  --shadow-popover:
+    0 30px 64px -16px rgb(0 0 0 / 0.75), 0 12px 24px -12px rgb(0 0 0 / 0.55);
+  --shadow-brand:
+    inset 0 1px 0 0 rgb(255 255 255 / 0.1), 0 1px 2px 0 rgb(0 0 0 / 0.5),
+    0 6px 16px -4px rgb(84 87 224 / 0.5);
+}
+
+/* A touch more ambient brand glow on the darker canvas. */
+:root.dark body {
+  background-image: radial-gradient(
+    1100px 560px at 50% -8%,
+    rgb(84 87 224 / 0.12),
+    transparent 70%
+  );
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -36,12 +36,12 @@ export function NewTeamPage() {
             required
             value={name}
             onChange={(event) => setName(event.target.value)}
-            className="rounded-control border-line-strong bg-surface focus:border-brand-500 w-full border px-3 py-2 text-sm shadow-sm focus:outline-none"
+            className="rounded-control border-line-strong bg-surface text-ink placeholder:text-ink-faint focus:border-brand-500 w-full border px-3 py-2 text-sm shadow-sm focus:outline-none"
           />
         </div>
 
         {createTeam.isError && (
-          <p className="rounded-control bg-red-50 px-3 py-2 text-sm text-red-700">
+          <p className="rounded-control bg-danger-soft text-danger-strong px-3 py-2 text-sm">
             Something went wrong. Please try again.
           </p>
         )}

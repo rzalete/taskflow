@@ -35,7 +35,7 @@ function segmentClass(active: boolean) {
   return [
     "rounded-control px-3 py-1 text-sm font-medium transition-colors",
     active
-      ? "bg-surface text-brand-700 shadow-sm"
+      ? "bg-surface text-brand-accent shadow-sm"
       : "text-ink-muted hover:text-ink",
   ].join(" ")
 }
@@ -240,7 +240,7 @@ export function ProjectBoardPage() {
       </div>
 
       {tasksQuery.isError && (
-        <p className="mt-4 text-sm text-red-600">Couldn't load tasks.</p>
+        <p className="text-danger-strong mt-4 text-sm">Couldn't load tasks.</p>
       )}
 
       {view === "board" ? (

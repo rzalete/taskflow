@@ -100,7 +100,7 @@ export function TaskDetailModal({
         aria-modal="true"
         aria-labelledby="task-details-title"
         tabIndex={-1}
-        className="rounded-card shadow-popover animate-dialog-show bg-surface flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col overflow-hidden ring-1 ring-black/5"
+        className="rounded-card shadow-popover animate-dialog-show bg-surface flex max-h-[calc(100vh-2rem)] w-full max-w-lg flex-col overflow-hidden ring-1 ring-black/5 dark:ring-white/10"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="border-line flex shrink-0 items-center justify-between border-b px-6 py-4">
@@ -244,7 +244,7 @@ export function TaskDetailModal({
               <button
                 type="button"
                 onClick={() => setConfirmingDelete(true)}
-                className="text-sm font-medium text-red-600 hover:underline"
+                className="text-danger-strong text-sm font-medium hover:underline"
               >
                 Delete
               </button>
