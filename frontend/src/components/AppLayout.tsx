@@ -54,7 +54,7 @@ export function AppLayout() {
       <aside className="bg-surface/70 border-line flex w-64 shrink-0 flex-col border-r backdrop-blur-sm">
         <div className="px-5 py-5">
           <Link
-            to="/"
+            to="/app"
             className="text-ink flex items-center gap-2.5 text-[15px] font-semibold tracking-tight"
           >
             <span className="bg-brand-gradient shadow-brand flex h-8 w-8 items-center justify-center rounded-[10px] text-sm font-bold text-white">
@@ -85,7 +85,7 @@ export function AppLayout() {
             {teamsQuery.data?.map((team) => (
               <NavLink
                 key={team.id}
-                to={`/teams/${team.id}`}
+                to={`/app/teams/${team.id}`}
                 className={navLinkClass}
               >
                 {({ isActive }) => (
@@ -113,7 +113,7 @@ export function AppLayout() {
           </div>
 
           <Link
-            to="/teams/new"
+            to="/app/teams/new"
             className="text-brand-accent hover:bg-brand-soft rounded-control mt-2 flex items-center gap-2 px-2.5 py-2 text-sm font-medium transition-colors"
           >
             <svg

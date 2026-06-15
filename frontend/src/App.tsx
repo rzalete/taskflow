@@ -5,6 +5,11 @@ import { AppLayout } from "./components/AppLayout"
 import { RouteFallback } from "./components/RouteFallback"
 import { ProtectedRoute } from "./features/auth/ProtectedRoute"
 
+const LandingPage = lazy(() =>
+  import("./features/marketing/LandingPage").then((m) => ({
+    default: m.LandingPage,
+  })),
+)
 const LoginPage = lazy(() =>
   import("./features/auth/LoginPage").then((m) => ({ default: m.LoginPage })),
 )
@@ -36,19 +41,24 @@ function App() {
   return (
     <Suspense fallback={<RouteFallback />}>
       <Routes>
+        {/* Public marketing surface */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
+
+        {/* Authenticated application shell, mounted under /app */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AppLayout />}>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/teams/new" element={<NewTeamPage />} />
-            <Route path="/teams/:teamId" element={<TeamPage />} />
+            <Route path="/app" element={<DashboardPage />} />
+            <Route path="/app/teams/new" element={<NewTeamPage />} />
+            <Route path="/app/teams/:teamId" element={<TeamPage />} />
             <Route
-              path="/teams/:teamId/projects/:projectId"
+              path="/app/teams/:teamId/projects/:projectId"
               element={<ProjectBoardPage />}
             />
           </Route>
         </Route>
+
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>

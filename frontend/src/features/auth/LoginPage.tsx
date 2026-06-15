@@ -18,7 +18,7 @@ export function LoginPage() {
 
   const from =
     (location.state as { from?: { pathname: string } } | null)?.from
-      ?.pathname ?? "/"
+      ?.pathname ?? "/app"
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
