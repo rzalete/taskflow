@@ -64,7 +64,7 @@ export function TeamPage() {
           {projectsQuery.data?.map((project) => (
             <li key={project.id}>
               <Link
-                to={`/teams/${id}/projects/${project.id}`}
+                to={`/app/teams/${id}/projects/${project.id}`}
                 className="rounded-card border-line bg-surface hover:border-line-strong hover:shadow-card block border p-4"
               >
                 <p className="text-ink font-medium">{project.name}</p>

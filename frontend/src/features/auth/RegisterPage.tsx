@@ -22,7 +22,7 @@ export function RegisterPage() {
     setIsSubmitting(true)
     try {
       await register({ email, password, full_name: fullName })
-      navigate("/", { replace: true })
+      navigate("/app", { replace: true })
     } catch (err) {
       setError(
         isAxiosError(err) && err.response?.status === 400
