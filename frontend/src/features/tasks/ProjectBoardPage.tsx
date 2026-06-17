@@ -288,10 +288,11 @@ export function ProjectBoardPage() {
                     ? Array.from({ length: 3 }).map((_, index) => (
                         <TaskCardSkeleton key={index} />
                       ))
-                    : columnTasks.map((task) => (
+                    : columnTasks.map((task, index) => (
                         <TaskCard
                           key={task.id}
                           task={task}
+                          index={index}
                           assigneeName={memberName(task.assignee_id)}
                           onOpen={handleOpen}
                         />

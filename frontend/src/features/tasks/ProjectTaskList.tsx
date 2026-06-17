@@ -2,6 +2,8 @@ import { useState } from "react"
 
 import { type Task, type TaskPriority, type TaskStatus } from "./tasksApi"
 import { StatusBadge, PriorityBadge } from "./TaskBadges"
+import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion"
+import { staggerDelayMs } from "../../lib/motion"
 
 type SortKey = "title" | "status" | "priority" | "assignee" | "due_date"
 type SortDir = "asc" | "desc"
@@ -40,6 +42,7 @@ export function ProjectTaskList({
 }) {
   const [sortKey, setSortKey] = useState<SortKey>("status")
   const [sortDir, setSortDir] = useState<SortDir>("asc")
+  const reduced = usePrefersReducedMotion()
 
   function toggleSort(key: SortKey) {
     if (key === sortKey) {
@@ -120,11 +123,14 @@ export function ProjectTaskList({
               </td>
             </tr>
           ) : (
-            sorted.map((task) => (
+            sorted.map((task, index) => (
               <tr
                 key={task.id}
                 onClick={() => onOpen(task.id)}
-                className="border-line hover:bg-canvas cursor-pointer border-b"
+                style={{
+                  animationDelay: `${staggerDelayMs(index, reduced)}ms`,
+                }}
+                className="animate-card-in border-line hover:bg-canvas cursor-pointer border-b"
               >
                 <td className="px-3 py-2">
                   <button

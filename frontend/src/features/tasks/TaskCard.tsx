@@ -5,6 +5,8 @@ import { type Task, type TaskPriority } from "./tasksApi"
 import { PriorityBadge } from "./TaskBadges"
 import { Avatar } from "./Avatar"
 import { formatDueDate } from "./taskFormat"
+import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion"
+import { staggerDelayMs } from "../../lib/motion"
 
 // Left-edge accent color per priority (matches the badge palette).
 const PRIORITY_ACCENT: Record<TaskPriority, string> = {
@@ -18,10 +20,12 @@ export function TaskCard({
   task,
   assigneeName,
   onOpen,
+  index = 0,
 }: {
   task: Task
   assigneeName?: string | null
   onOpen: (taskId: number) => void
+  index?: number
 }) {
   const {
     attributes,
@@ -33,9 +37,12 @@ export function TaskCard({
     isDragging,
   } = useSortable({ id: task.id })
 
+  const reduced = usePrefersReducedMotion()
+
   const style = {
     transform: CSS.Translate.toString(transform),
     transition,
+    animationDelay: `${staggerDelayMs(index, reduced)}ms`,
   }
 
   const due = formatDueDate(task.due_date)
@@ -52,7 +59,7 @@ export function TaskCard({
       style={style}
       onClick={() => onOpen(task.id)}
       {...listeners}
-      className={`rounded-card shadow-card hover:shadow-card-hover border-line bg-surface cursor-grab border border-l-4 p-3 transition-[box-shadow,transform] hover:-translate-y-0.5 ${
+      className={`animate-card-in rounded-card shadow-card hover:shadow-card-hover border-line bg-surface cursor-grab border border-l-4 p-3 transition-[box-shadow,transform] hover:-translate-y-0.5 ${
         PRIORITY_ACCENT[task.priority]
       } ${isDragging ? "opacity-50" : ""}`}
     >
