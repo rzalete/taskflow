@@ -4,6 +4,7 @@ import { type Task, type TaskPriority, type TaskStatus } from "./tasksApi"
 import { StatusBadge, PriorityBadge } from "./TaskBadges"
 import { usePrefersReducedMotion } from "../../hooks/usePrefersReducedMotion"
 import { staggerDelayMs } from "../../lib/motion"
+import { EmptyState } from "../../components/ui/EmptyState"
 
 type SortKey = "title" | "status" | "priority" | "assignee" | "due_date"
 type SortDir = "asc" | "desc"
@@ -78,6 +79,18 @@ export function ProjectTaskList({
     }
   })
 
+  if (sorted.length === 0) {
+    return (
+      <div className="mt-6">
+        <EmptyState
+          icon="list"
+          title="No tasks to show"
+          description="Add a task above, or change the assignee and status filters."
+        />
+      </div>
+    )
+  }
+
   return (
     <div className="mt-6 overflow-x-auto">
       <table className="w-full border-collapse text-left text-sm">
@@ -113,52 +126,41 @@ export function ProjectTaskList({
           </tr>
         </thead>
         <tbody>
-          {sorted.length === 0 ? (
-            <tr>
-              <td
-                colSpan={HEADERS.length}
-                className="text-ink-muted px-3 py-6 text-center"
-              >
-                No tasks match the current filters.
+          {sorted.map((task, index) => (
+            <tr
+              key={task.id}
+              onClick={() => onOpen(task.id)}
+              style={{
+                animationDelay: `${staggerDelayMs(index, reduced)}ms`,
+              }}
+              className="animate-card-in border-line hover:bg-canvas cursor-pointer border-b"
+            >
+              <td className="px-3 py-2">
+                <button
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation()
+                    onOpen(task.id)
+                  }}
+                  className="text-ink text-left font-medium hover:underline"
+                >
+                  {task.title}
+                </button>
+              </td>
+              <td className="text-ink-muted px-3 py-2">
+                <StatusBadge status={task.status} />
+              </td>
+              <td className="px-3 py-2">
+                <PriorityBadge priority={task.priority} />
+              </td>
+              <td className="text-ink-muted px-3 py-2">
+                {getAssigneeName(task.assignee_id)}
+              </td>
+              <td className="text-ink-muted px-3 py-2">
+                {task.due_date ?? "No date"}
               </td>
             </tr>
-          ) : (
-            sorted.map((task, index) => (
-              <tr
-                key={task.id}
-                onClick={() => onOpen(task.id)}
-                style={{
-                  animationDelay: `${staggerDelayMs(index, reduced)}ms`,
-                }}
-                className="animate-card-in border-line hover:bg-canvas cursor-pointer border-b"
-              >
-                <td className="px-3 py-2">
-                  <button
-                    type="button"
-                    onClick={(event) => {
-                      event.stopPropagation()
-                      onOpen(task.id)
-                    }}
-                    className="text-ink text-left font-medium hover:underline"
-                  >
-                    {task.title}
-                  </button>
-                </td>
-                <td className="text-ink-muted px-3 py-2">
-                  <StatusBadge status={task.status} />
-                </td>
-                <td className="px-3 py-2">
-                  <PriorityBadge priority={task.priority} />
-                </td>
-                <td className="text-ink-muted px-3 py-2">
-                  {getAssigneeName(task.assignee_id)}
-                </td>
-                <td className="text-ink-muted px-3 py-2">
-                  {task.due_date ?? "—"}
-                </td>
-              </tr>
-            ))
-          )}
+          ))}
         </tbody>
       </table>
     </div>
