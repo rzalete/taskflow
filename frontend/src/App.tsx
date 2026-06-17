@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router"
 
 import { AppLayout } from "./components/AppLayout"
 import { RouteFallback } from "./components/RouteFallback"
+import { RouteTransition } from "./components/RouteTransition"
 import { ProtectedRoute } from "./features/auth/ProtectedRoute"
 
 const LandingPage = lazy(() =>
@@ -42,9 +43,30 @@ function App() {
     <Suspense fallback={<RouteFallback />}>
       <Routes>
         {/* Public marketing surface */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/"
+          element={
+            <RouteTransition>
+              <LandingPage />
+            </RouteTransition>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+            <RouteTransition>
+              <LoginPage />
+            </RouteTransition>
+          }
+        />
+        <Route
+          path="/register"
+          element={
+            <RouteTransition>
+              <RegisterPage />
+            </RouteTransition>
+          }
+        />
 
         {/* Authenticated application shell, mounted under /app */}
         <Route element={<ProtectedRoute />}>

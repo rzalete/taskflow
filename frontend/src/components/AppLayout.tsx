@@ -2,6 +2,7 @@ import { Suspense } from "react"
 import { Link, NavLink, Outlet } from "react-router"
 
 import { RouteFallback } from "./RouteFallback"
+import { RouteTransition } from "./RouteTransition"
 import { useAuth } from "../features/auth/auth-context"
 import { HealthStatus } from "../features/health/HealthStatus"
 import { ThemeToggle } from "../features/theme/ThemeToggle"
@@ -176,11 +177,11 @@ export function AppLayout() {
         </header>
 
         <main className="flex-1 px-6 py-8">
-          <div className="animate-fade-in-up mx-auto w-full max-w-7xl">
+          <RouteTransition className="mx-auto w-full max-w-7xl">
             <Suspense fallback={<RouteFallback />}>
               <Outlet />
             </Suspense>
-          </div>
+          </RouteTransition>
         </main>
       </div>
     </div>
