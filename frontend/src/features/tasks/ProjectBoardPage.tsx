@@ -21,6 +21,8 @@ import { useMembers } from "../teams/useMembers"
 import { TaskDetailModal } from "./TaskDetailModal"
 import { ProjectTaskList } from "./ProjectTaskList"
 import { Button } from "../../components/ui/Button"
+import { EmptyState } from "../../components/ui/EmptyState"
+import { ErrorState } from "../../components/ui/ErrorState"
 
 const COLUMNS: { status: TaskStatus; title: string }[] = (
   ["backlog", "todo", "in_progress", "in_review", "done"] as const
@@ -78,6 +80,9 @@ export function ProjectBoardPage() {
   const listTasks = visibleTasks.filter(
     (task) => statusFilter === "all" || task.status === statusFilter,
   )
+
+  // No tasks at all in this project (distinct from a filter hiding every task).
+  const isEmpty = !tasksQuery.isPending && (tasksQuery.data?.length ?? 0) === 0
 
   const memberName = (assigneeId: number | null) => {
     if (assigneeId === null) return "Unassigned"
@@ -240,75 +245,89 @@ export function ProjectBoardPage() {
       </div>
 
       {tasksQuery.isError && (
-        <p className="text-danger-strong mt-4 text-sm">Couldn't load tasks.</p>
+        <div className="mt-6">
+          <ErrorState onRetry={() => void tasksQuery.refetch()} />
+        </div>
       )}
 
-      {view === "board" ? (
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCorners}
-          onDragEnd={handleDragEnd}
-          accessibility={{
-            announcements: {
-              onDragStart: ({ active }) =>
-                `Picked up ${taskTitleById(active.id)}.`,
-              onDragOver: ({ active, over }) =>
-                over
-                  ? `${taskTitleById(active.id)} is over ${dropTargetLabel(over.id)}.`
-                  : `${taskTitleById(active.id)} is no longer over a drop target.`,
-              onDragEnd: ({ active, over }) =>
-                over
-                  ? `${taskTitleById(active.id)} was dropped onto ${dropTargetLabel(over.id)}.`
-                  : `${taskTitleById(active.id)} was dropped.`,
-              onDragCancel: ({ active }) =>
-                `Dragging ${taskTitleById(active.id)} was cancelled.`,
-            },
-            screenReaderInstructions: {
-              draggable:
-                "To pick up a task, focus its drag handle and press Space or Enter. Use the arrow keys to move it between positions and columns. Press Space or Enter to drop, or Escape to cancel.",
-            },
-          }}
-        >
-          <div className="mt-6 flex gap-3 overflow-x-auto pb-4">
-            {COLUMNS.map((column, index) => {
-              const columnTasks = visibleTasks
-                .filter((task) => task.status === column.status)
-                .sort((a, b) => a.position - b.position)
-              return (
-                <BoardColumn
-                  key={column.status}
-                  index={index}
-                  id={column.status}
-                  title={column.title}
-                  count={columnTasks.length}
-                  taskIds={columnTasks.map((task) => task.id)}
-                  loading={tasksQuery.isPending}
-                >
-                  {tasksQuery.isPending
-                    ? Array.from({ length: 3 }).map((_, index) => (
-                        <TaskCardSkeleton key={index} />
-                      ))
-                    : columnTasks.map((task, index) => (
-                        <TaskCard
-                          key={task.id}
-                          task={task}
-                          index={index}
-                          assigneeName={memberName(task.assignee_id)}
-                          onOpen={handleOpen}
-                        />
-                      ))}
-                </BoardColumn>
-              )
-            })}
-          </div>
-        </DndContext>
-      ) : (
-        <ProjectTaskList
-          tasks={listTasks}
-          getAssigneeName={memberName}
-          onOpen={handleOpen}
-        />
+      {!tasksQuery.isError && isEmpty && (
+        <div className="mt-6">
+          <EmptyState
+            icon="board"
+            title="No tasks yet"
+            description="Add your first task with the form above to start the board."
+          />
+        </div>
       )}
+
+      {!tasksQuery.isError &&
+        !isEmpty &&
+        (view === "board" ? (
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCorners}
+            onDragEnd={handleDragEnd}
+            accessibility={{
+              announcements: {
+                onDragStart: ({ active }) =>
+                  `Picked up ${taskTitleById(active.id)}.`,
+                onDragOver: ({ active, over }) =>
+                  over
+                    ? `${taskTitleById(active.id)} is over ${dropTargetLabel(over.id)}.`
+                    : `${taskTitleById(active.id)} is no longer over a drop target.`,
+                onDragEnd: ({ active, over }) =>
+                  over
+                    ? `${taskTitleById(active.id)} was dropped onto ${dropTargetLabel(over.id)}.`
+                    : `${taskTitleById(active.id)} was dropped.`,
+                onDragCancel: ({ active }) =>
+                  `Dragging ${taskTitleById(active.id)} was cancelled.`,
+              },
+              screenReaderInstructions: {
+                draggable:
+                  "To pick up a task, focus its drag handle and press Space or Enter. Use the arrow keys to move it between positions and columns. Press Space or Enter to drop, or Escape to cancel.",
+              },
+            }}
+          >
+            <div className="mt-6 flex gap-3 overflow-x-auto pb-4">
+              {COLUMNS.map((column, index) => {
+                const columnTasks = visibleTasks
+                  .filter((task) => task.status === column.status)
+                  .sort((a, b) => a.position - b.position)
+                return (
+                  <BoardColumn
+                    key={column.status}
+                    index={index}
+                    id={column.status}
+                    title={column.title}
+                    count={columnTasks.length}
+                    taskIds={columnTasks.map((task) => task.id)}
+                    loading={tasksQuery.isPending}
+                  >
+                    {tasksQuery.isPending
+                      ? Array.from({ length: 3 }).map((_, index) => (
+                          <TaskCardSkeleton key={index} />
+                        ))
+                      : columnTasks.map((task, index) => (
+                          <TaskCard
+                            key={task.id}
+                            task={task}
+                            index={index}
+                            assigneeName={memberName(task.assignee_id)}
+                            onOpen={handleOpen}
+                          />
+                        ))}
+                  </BoardColumn>
+                )
+              })}
+            </div>
+          </DndContext>
+        ) : (
+          <ProjectTaskList
+            tasks={listTasks}
+            getAssigneeName={memberName}
+            onOpen={handleOpen}
+          />
+        ))}
       {selectedTask && (
         <TaskDetailModal
           task={selectedTask}

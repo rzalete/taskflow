@@ -6,10 +6,10 @@ export function DashboardPage() {
   return (
     <div className="mx-auto max-w-3xl">
       <h1 className="text-display text-ink font-bold">
-        Welcome, {user?.full_name ?? "there"} 👋
+        Welcome back, {user?.full_name ?? "there"}
       </h1>
       <p className="text-ink-muted mt-2">
-        Select a team from the sidebar, or create one to get started.
+        Pick a team from the sidebar to open its projects, or create a new team.
       </p>
     </div>
   )

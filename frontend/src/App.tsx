@@ -1,7 +1,8 @@
 import { lazy, Suspense } from "react"
-import { Navigate, Route, Routes } from "react-router"
+import { Route, Routes } from "react-router"
 
 import { AppLayout } from "./components/AppLayout"
+import { ErrorBoundary } from "./components/ErrorBoundary"
 import { RouteFallback } from "./components/RouteFallback"
 import { RouteTransition } from "./components/RouteTransition"
 import { ProtectedRoute } from "./features/auth/ProtectedRoute"
@@ -37,53 +38,67 @@ const ProjectBoardPage = lazy(() =>
     default: m.ProjectBoardPage,
   })),
 )
+const NotFoundPage = lazy(() =>
+  import("./features/marketing/NotFoundPage").then((m) => ({
+    default: m.NotFoundPage,
+  })),
+)
 
 function App() {
   return (
-    <Suspense fallback={<RouteFallback />}>
-      <Routes>
-        {/* Public marketing surface */}
-        <Route
-          path="/"
-          element={
-            <RouteTransition>
-              <LandingPage />
-            </RouteTransition>
-          }
-        />
-        <Route
-          path="/login"
-          element={
-            <RouteTransition>
-              <LoginPage />
-            </RouteTransition>
-          }
-        />
-        <Route
-          path="/register"
-          element={
-            <RouteTransition>
-              <RegisterPage />
-            </RouteTransition>
-          }
-        />
+    <ErrorBoundary>
+      <Suspense fallback={<RouteFallback />}>
+        <Routes>
+          {/* Public marketing surface */}
+          <Route
+            path="/"
+            element={
+              <RouteTransition>
+                <LandingPage />
+              </RouteTransition>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              <RouteTransition>
+                <LoginPage />
+              </RouteTransition>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <RouteTransition>
+                <RegisterPage />
+              </RouteTransition>
+            }
+          />
 
-        {/* Authenticated application shell, mounted under /app */}
-        <Route element={<ProtectedRoute />}>
-          <Route element={<AppLayout />}>
-            <Route path="/app" element={<DashboardPage />} />
-            <Route path="/app/teams/new" element={<NewTeamPage />} />
-            <Route path="/app/teams/:teamId" element={<TeamPage />} />
-            <Route
-              path="/app/teams/:teamId/projects/:projectId"
-              element={<ProjectBoardPage />}
-            />
+          {/* Authenticated application shell, mounted under /app */}
+          <Route element={<ProtectedRoute />}>
+            <Route element={<AppLayout />}>
+              <Route path="/app" element={<DashboardPage />} />
+              <Route path="/app/teams/new" element={<NewTeamPage />} />
+              <Route path="/app/teams/:teamId" element={<TeamPage />} />
+              <Route
+                path="/app/teams/:teamId/projects/:projectId"
+                element={<ProjectBoardPage />}
+              />
+            </Route>
           </Route>
-        </Route>
 
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
-    </Suspense>
+          <Route
+            path="*"
+            element={
+              <RouteTransition>
+                <NotFoundPage />
+              </RouteTransition>
+            }
+          />
+        </Routes>
+      </Suspense>
+    </ErrorBoundary>
   )
 }
 
